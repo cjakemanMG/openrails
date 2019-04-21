@@ -27,6 +27,10 @@ namespace Orts.Common
     public enum Event
     {
         None,
+        AITrainApproachingStation,
+        AITrainHelperLoco,
+        AITrainLeadLoco,
+        AITrainLeavingStation,
         BellOff,
         BellOn,
         BlowerChange,
@@ -93,6 +97,8 @@ namespace Orts.Common
         PermissionDenied,
         PermissionGranted,
         PermissionToDepart,
+        PlayerTrainHelperLoco,
+        PlayerTrainLeadLoco,
         ReverserChange,
         ReverserToForwardBackward,
         ReverserToNeutral,
@@ -344,7 +350,15 @@ namespace Orts.Common
                         case 170: return Event.Pantograph3Down;
                         case 171: return Event.Pantograph4Up;
                         case 172: return Event.Pantograph4Down;
+
+                        case 173: return Event.AITrainLeadLoco;
+                        case 174: return Event.AITrainHelperLoco;
+                        case 175: return Event.PlayerTrainLeadLoco;
+                        case 176: return Event.PlayerTrainHelperLoco;
+                        case 177: return Event.AITrainApproachingStation;
+                        case 178: return Event.AITrainLeavingStation;
                         //
+
 
                         default: return 0;
                     }
