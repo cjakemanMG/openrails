@@ -58,18 +58,29 @@ function api() {
 				var cols = obj.commonTable.nCols;
 				Str = "<table>";  
 				var next = 0;
+				var endIndex = 0;
+				var newData = "";
 				for (var row = 0; row < obj.commonTable.nRows; ++row) {
 					Str += "<tr>";
 					for (var col=0; col < obj.commonTable.nCols; ++col) { 
+						if (obj.commonTable.values[next] != null) {
+							endIndex = obj.commonTable.values[next].length;
+							newData = obj.commonTable.values[next].slice(0, endIndex -3);
+						}
 						if (obj.commonTable.values[next] == null) {
 							Str += "<td></td>";
 						}
-						else if (obj.commonTable.values[next].slice(-3) == "???"
-						|| obj.commonTable.values[next].slice(-3) == "!!!"
-						|| obj.commonTable.values[next].slice(-3) == "%%%") {
-							var endIndex = obj.commonTable.values[next].length;
-							var newData = obj.commonTable.values[next].slice(0, endIndex -3);
-							Str += "<td>"  + newData + "</td>";
+						else if (obj.commonTable.values[next].slice(-3) == "???") {
+							Str += "<td style='color:#ffff00'>" +  newData + "</td>";//Yellow
+						}
+						else if (obj.commonTable.values[next].slice(-3) == "!!!") {
+							Str += "<td style='color:#ff4500'>" +  newData + "</td>";//OrangeRed
+						}
+						else if (obj.commonTable.values[next].slice(-3) == "%%%") {
+							Str += "<td style='color:#00ffff'>" +  newData + "</td>";//Cyan
+						}
+						else if (obj.commonTable.values[next].slice(-3) == "$$$") {
+							Str += "<td style='color:#ffc0cb'>" +  newData + "</td>";//Pink
 						}
 						else {
 							Str += "<td>" + obj.commonTable.values[next] + "</td>";
@@ -89,15 +100,24 @@ function api() {
 					for (var row = 0; row < obj.extraTable.nRows; ++row) {
 						Str += "<tr>";
 						for (var col=0; col < obj.extraTable.nCols; ++col) { 
+							if (obj.extraTable.values[next] != null) {
+								endIndex = obj.extraTable.values[next].length;
+								newData = obj.extraTable.values[next].slice(0, endIndex -3);
+							}
 							if (obj.extraTable.values[next] == null) {
 								Str += "<td></td>";
 							}
-							else if (obj.extraTable.values[next].slice(-3) == "???"
-							|| obj.extraTable.values[next].slice(-3) == "!!!"
-							|| obj.extraTable.values[next].slice(-3) == "%%%") {
-								var endIndex = obj.extraTable.values[next].length;
-								var newData = obj.extraTable.values[next].slice(0, endIndex -3);
-								Str += "<td>"  + newData + "</td>";								
+							else if (obj.extraTable.values[next].slice(-3) == "???") {
+								Str += "<td style='color:#ffff00'>" +  newData + "</td>";//Yellow
+							}
+							else if (obj.extraTable.values[next].slice(-3) == "!!!") {
+								Str += "<td style='color:#ff4500'>" +  newData + "</td>";//OrangeRed
+							}
+							else if (obj.extraTable.values[next].slice(-3) == "%%%") {
+								Str += "<td style='color:#00ffff'>" +  newData + "</td>";//Cyan
+							}
+							else if (obj.extraTable.values[next].slice(-3) == "$$$") {
+								Str += "<td style='color:#ffc0cb'>" +  newData + "</td>";//Pink
 							}
 							else {
 								Str += "<td>"  + obj.extraTable.values[next] + "</td>";
