@@ -485,10 +485,10 @@ namespace Orts.Viewer3D.WebServices
 
         private static void SendHttp(HttpResponse response)
         {
-            // Convert the string data to byte data using ASCII encoding.
+            // Convert the string data to byte data using UTF8 encoding.
             if (response.strContent.Length > 0)
             {
-                response.byteContent = Encoding.ASCII.GetBytes(response.strContent);
+                response.byteContent = Encoding.UTF8.GetBytes(response.strContent);
             }
             byte[] byteData = CharEncoder.GetBytes(
                               "HTTP/1.1 " + response.ResponseCode + "\r\n"
