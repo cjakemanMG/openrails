@@ -115,6 +115,8 @@ namespace Orts.Simulation.RollingStocks
         public bool Bell = false;
         protected bool PreviousBell = false;
 
+        public bool VacuumExhausterPressed = false;
+
         public bool AlerterSnd;
         public bool VigilanceMonitor;
         public bool Sander;
@@ -320,8 +322,6 @@ namespace Orts.Simulation.RollingStocks
         public bool HasSmoothStruc;
 
         public float MaxContinuousForceN;
-        public float SpeedOfMaxContinuousForceMpS;  // Speed where maximum tractive effort occurs
-        public float MSTSSpeedOfMaxContinuousForceMpS;  // Speed where maximum tractive effort occurs - MSTS parameter if used
         public float ContinuousForceTimeFactor = 1800;
         public bool AntiSlip;
         public bool AdvancedAdhesionModel = false; // flag set depending upon adhesion model used.
@@ -702,8 +702,6 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(maxforce": MaxForceN = stf.ReadFloatBlock(STFReader.UNITS.Force, null); break;
                 case "engine(maxcurrent": MaxCurrentA = stf.ReadFloatBlock(STFReader.UNITS.Current, null); break;
                 case "engine(maxcontinuousforce": MaxContinuousForceN = stf.ReadFloatBlock(STFReader.UNITS.Force, null); break;
-                case "engine(ortsspeedofmaxcontinuousforce": SpeedOfMaxContinuousForceMpS = stf.ReadFloatBlock(STFReader.UNITS.Speed, null); break;
-                case "engine(dieselenginespeedofmaxtractiveeffort": MSTSSpeedOfMaxContinuousForceMpS = stf.ReadFloatBlock(STFReader.UNITS.Speed, null); break;
                 case "engine(maxvelocity": MaxSpeedMpS = stf.ReadFloatBlock(STFReader.UNITS.Speed, null); break;
 
                 case "engine(type":
@@ -879,8 +877,6 @@ namespace Orts.Simulation.RollingStocks
             EngineType = locoCopy.EngineType;
             TractiveForceCurves = locoCopy.TractiveForceCurves;
             MaxContinuousForceN = locoCopy.MaxContinuousForceN;
-            SpeedOfMaxContinuousForceMpS = locoCopy.SpeedOfMaxContinuousForceMpS;
-            MSTSSpeedOfMaxContinuousForceMpS = locoCopy.MSTSSpeedOfMaxContinuousForceMpS;
             ContinuousForceTimeFactor = locoCopy.ContinuousForceTimeFactor;
             DynamicBrakeForceCurves = locoCopy.DynamicBrakeForceCurves;
             DynamicBrakeAutoBailOff = locoCopy.DynamicBrakeAutoBailOff;
@@ -972,6 +968,7 @@ namespace Orts.Simulation.RollingStocks
             // we won't save the horn state
             outf.Write(Bell);
             outf.Write(Sander);
+            outf.Write(VacuumExhausterPressed);
             outf.Write(Wiper);
             outf.Write(OdometerResetPositionM);
             outf.Write(OdometerCountingUp);
@@ -1007,6 +1004,7 @@ namespace Orts.Simulation.RollingStocks
         {
             if (inf.ReadBoolean()) SignalEvent(Event.BellOn);
             if (inf.ReadBoolean()) SignalEvent(Event.SanderOn);
+            if (inf.ReadBoolean()) SignalEvent(Event.VacuumExhausterOn);
             if (inf.ReadBoolean()) SignalEvent(Event.WiperOn);
             OdometerResetPositionM = inf.ReadSingle();
             OdometerCountingUp = inf.ReadBoolean();
@@ -1490,7 +1488,7 @@ namespace Orts.Simulation.RollingStocks
                             DynamicBrakeController.CurrentValue * 100);
                     }
 
-                    if ((Simulator.UseAdvancedAdhesion) && (!Simulator.Paused)) 
+                    if (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics && !Simulator.Paused) 
                     {
                         AdvancedAdhesion(elapsedClockSeconds); // Use advanced adhesion model
                         AdvancedAdhesionModel = true;  // Set flag to advise advanced adhesion model is in use
@@ -3665,8 +3663,8 @@ namespace Orts.Simulation.RollingStocks
 
                 case Event.CompressorOn: { CompressorIsOn = true; break; }
                 case Event.CompressorOff: { CompressorIsOn = false; break; }
-                case Event.VacuumExhausterOn: { VacuumExhausterIsOn = true; break; }
-                case Event.VacuumExhausterOff : { VacuumExhausterIsOn = false; break; }
+                case Event.VacuumExhausterOn: { VacuumExhausterPressed = true; if (this.IsLeadLocomotive() && this == Simulator.PlayerLocomotive && Simulator.Confirmer != null) Simulator.Confirmer.Confirm(CabControl.VacuumExhauster, CabSetting.On); break; }
+                case Event.VacuumExhausterOff : { VacuumExhausterPressed = false; if (this.IsLeadLocomotive() && this == Simulator.PlayerLocomotive && Simulator.Confirmer != null) Simulator.Confirmer.Confirm(CabControl.VacuumExhauster, CabSetting.Off); break; }
 
                 case Event._ResetWheelSlip: { LocomotiveAxle.Reset(Simulator.GameTime, SpeedMpS); ThrottleController.SetValue(0.0f); break; }
                 case Event.TrainBrakePressureDecrease:
@@ -4019,6 +4017,12 @@ namespace Orts.Simulation.RollingStocks
                         data = Wiper ? 1 : 0;
                         break;
                     }
+                case CABViewControlTypes.VACUUM_EXHAUSTER:
+                    {
+                        data = VacuumExhausterPressed ? 1 : 0;
+                        break;
+                    }
+
                 case CABViewControlTypes.HORN:
                     {
                         data = Horn ? 1 : 0;

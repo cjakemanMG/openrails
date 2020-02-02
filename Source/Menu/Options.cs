@@ -228,7 +228,6 @@ namespace ORTS
             checkDataLogPhysics.Checked = Settings.DataLogPhysics;
             checkDataLogMisc.Checked = Settings.DataLogMisc;
             checkDataLogSteamPerformance.Checked = Settings.DataLogSteamPerformance;
-            checkVerboseConfigurationMessages.Checked = Settings.VerboseConfigurationMessages;
 
             // Evaluation tab
             checkDataLogTrainSpeed.Checked = Settings.DataLogTrainSpeed;
@@ -513,7 +512,6 @@ private async void OptionsForm_Shown(object sender, EventArgs e)
             Settings.DataLogPhysics = checkDataLogPhysics.Checked;
             Settings.DataLogMisc = checkDataLogMisc.Checked;
             Settings.DataLogSteamPerformance = checkDataLogSteamPerformance.Checked;
-            Settings.VerboseConfigurationMessages = checkVerboseConfigurationMessages.Checked;
 
             // Evaluation tab
             Settings.DataLogTrainSpeed = checkDataLogTrainSpeed.Checked;
