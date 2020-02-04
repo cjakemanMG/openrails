@@ -21,6 +21,7 @@
 using Orts.Common;
 using Orts.Parsers.Msts;
 using Orts.Simulation.Physics;
+using Orts.Simulation.Signalling;
 using ORTS.Common;
 using ORTS.Scripting.Api;
 using System;
@@ -246,6 +247,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.NextSignalSpeedLimitMpS = (value) => NextSignalItem<float>(value, ref SignalSpeedLimits, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.NextSignalAspect = (value) => NextSignalItem<Aspect>(value, ref SignalAspects, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.NextSignalDistanceM = (value) => NextSignalItem<float>(value, ref SignalDistances, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
+            Script.DoesNextNormalSignalHaveDistanceHead = () => DoesNextNormalSignalHaveDistanceHead();
+            Script.DoesNextNormalSignalHaveTwoAspects = () => DoesNextNormalSignalHaveTwoAspects();
+            Script.NextDistanceSignalAspect = () => NextDistanceSignalItem<Aspect>(ref SignalAspects, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
+            Script.NextDistanceSignalDistanceM = () => NextDistanceSignalItem<float>(ref SignalDistances, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.CurrentPostSpeedLimitMpS = () => Locomotive.Train.allowedMaxSpeedLimitMpS;
             Script.NextPostSpeedLimitMpS = (value) => NextSignalItem<float>(value, ref PostSpeedLimits, Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST);
             Script.NextPostDistanceM = (value) => NextSignalItem<float>(value, ref PostDistances, Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST);
@@ -407,6 +412,66 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 PostDistances.Add(float.MaxValue);
             }
         }
+
+        private bool DoesNextNormalSignalHaveDistanceHead()
+        {
+            foreach (var foundItem in Locomotive.Train.SignalObjectItems)
+            {
+                if (foundItem.ObjectType == ObjectItemInfo.ObjectItemType.Signal)
+                {
+                    var signal = foundItem.ObjectDetails;
+                    foreach (var signalHead in signal.SignalHeads)
+                    {
+                        if (signalHead.signalType.FnType == Formats.Msts.MstsSignalFunction.DISTANCE)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private bool DoesNextNormalSignalHaveTwoAspects()
+            // ...and the two aspects are STOP and CLEAR_2
+        {
+            var signalsFound = 0;
+
+            foreach (var foundItem in Locomotive.Train.SignalObjectItems)
+            {
+                if (foundItem.ObjectType == ObjectItemInfo.ObjectItemType.Signal)
+                {
+                    signalsFound++;
+                    var signal = foundItem.ObjectDetails;
+                    if (signal.SignalHeads.Count > 1 || signal.SignalHeads[0].signalType.Aspects.Count > 2) return false;
+                    else if ((int)(signal.SignalHeads[0].signalType.Aspects[0].Aspect) == 0 &&
+                            (int)(signal.SignalHeads[0].signalType.Aspects[1].Aspect) == 7) return true;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        T NextDistanceSignalItem<T>(ref List<T> list, Train.TrainObjectItem.TRAINOBJECTTYPE type)
+        {
+            if (Locomotive.Train.ValidRoute[0] != null && Locomotive.Train.PresentPosition[0].RouteListIndex >= 0)
+            {
+                TrackCircuitSignalItem nextSignal = Locomotive.Train.signalRef.Find_Next_Object_InRoute(Locomotive.Train.ValidRoute[0],
+                    Locomotive.Train.PresentPosition[0].RouteListIndex, Locomotive.Train.PresentPosition[0].TCOffset,
+                            400, Formats.Msts.MstsSignalFunction.DISTANCE, Locomotive.Train.routedForward);
+
+                if (nextSignal.SignalState == ObjectItemInfo.ObjectItemFindState.Object)
+                {
+                    Aspect distanceSignalAspect = (Aspect)Locomotive.Train.signalRef.TranslateToTCSAspect(nextSignal.SignalRef.this_sig_lr(Orts.Formats.Msts.MstsSignalFunction.DISTANCE));
+                    SignalAspects.Add(distanceSignalAspect);
+                    SignalDistances.Add(nextSignal.SignalLocation);
+                    return list[0];
+                }
+            }
+
+            SignalAspects.Add(Aspect.None);
+            SignalDistances.Add(float.MaxValue);
+            return list[0];
+        }
+
 
         private void SignalEvent(Event evt, TrainControlSystem script)
         {

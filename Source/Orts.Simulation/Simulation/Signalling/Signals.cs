@@ -1382,10 +1382,27 @@ namespace Orts.Simulation.Signalling
                         }
                     }
                 }
+                else if (fn_type == MstsSignalFunction.DISTANCE)
+                {
+                    TrackCircuitSignalList thisSignalList =
+                        thisSection.CircuitItems.TrackCircuitSignals[actDirection][(int)MstsSignalFunction.DISTANCE];
+                    locstate = ObjectItemInfo.ObjectItemFindState.None;
 
-                // next section accessed via next route element
+                    if (thisSignalList.TrackCircuitItem.Count > 0)
+                    {
+                        TrackCircuitSignalItem thisSignal = thisSignalList.TrackCircuitItem[0];
+                        if (thisSignal.SignalLocation > lengthOffset)
+                        {
+                            locstate = ObjectItemInfo.ObjectItemFindState.Object;
+                            foundObject = thisSignal.SignalRef;
+                            totalLength += (thisSignal.SignalLocation - lengthOffset);
+                        }
+                    }
+                }
 
-                if (locstate == ObjectItemInfo.ObjectItemFindState.None)
+                    // next section accessed via next route element
+
+                    if (locstate == ObjectItemInfo.ObjectItemFindState.None)
                 {
                     totalLength += (thisSection.Length - lengthOffset);
                     lengthOffset = 0;
@@ -1605,6 +1622,36 @@ namespace Orts.Simulation.Signalling
 
             return (returnItem);
         }
+
+        //================================================================================================//
+        /// <summary>
+        /// Gets the Track Monitor Aspect from the MSTS aspect (for the TCS) 
+        /// </summary>
+
+        public TrackMonitorSignalAspect TranslateToTCSAspect(MstsSignalAspect SigState)
+        {
+            switch (SigState)
+            {
+                case MstsSignalAspect.STOP:
+                    return TrackMonitorSignalAspect.Stop;
+                case MstsSignalAspect.STOP_AND_PROCEED:
+                    return TrackMonitorSignalAspect.StopAndProceed;
+                case MstsSignalAspect.RESTRICTING:
+                    return TrackMonitorSignalAspect.Restricted;
+                case MstsSignalAspect.APPROACH_1:
+                    return TrackMonitorSignalAspect.Approach_1;
+                case MstsSignalAspect.APPROACH_2:
+                    return TrackMonitorSignalAspect.Approach_2;
+                case MstsSignalAspect.APPROACH_3:
+                    return TrackMonitorSignalAspect.Approach_3;
+                case MstsSignalAspect.CLEAR_1:
+                    return TrackMonitorSignalAspect.Clear_1;
+                case MstsSignalAspect.CLEAR_2:
+                    return TrackMonitorSignalAspect.Clear_2;
+                default:
+                    return TrackMonitorSignalAspect.None;
+            }
+        } // GetMonitorAspect
 
         //================================================================================================//
         /// <summary>

@@ -61,6 +61,22 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<int, float> NextSignalDistanceM;
         /// <summary>
+        /// True if next NORMAL signal has a DISTANCE head.
+        /// </summary>
+        public Func<bool> DoesNextNormalSignalHaveDistanceHead;
+        /// <summary>
+        /// Next normal signal has only two aspects (STOP and CLEAR_2).
+        /// </summary>
+        public Func<bool> DoesNextNormalSignalHaveTwoAspects;
+        /// <summary>
+        /// Aspect of the next DISTANCE signal.
+        /// </summary>
+        public Func<Aspect> NextDistanceSignalAspect;
+        /// <summary>
+        /// Distance to next DISTANCE signal.
+        /// </summary>
+        public Func<float> NextDistanceSignalDistanceM;
+        /// <summary>
         /// Max allowed speed determined by current speedpost.
         /// </summary>
         public Func<float> CurrentPostSpeedLimitMpS;
