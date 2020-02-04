@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.51
-January 29th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.52
+February 4th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,10 +12,9 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the official Open Rails unstable revision U2020.01.25-0551 (which does not include Monogame)
-and from the official OpenRails testing revision X1.3.1-120.
+This unofficial version has been derived from the official Open Rails unstable revision U2020.02.01-0151 (which already includes Monogame)
+and from the official OpenRails testing revision X1.3.1-123.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
-- Monogame
 - addition of track sounds in the sound debug window (by dennisat)
 - F5 HUD scrolling (by mbm_or)
 - checkbox in General Options tab to enable or disable watchdog
@@ -30,14 +29,12 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - inserted extended Raildriver setup, as present in OR Ultimate (by perpetualKid)
 - set Simple Control and Physics option as default
 - bug fix for https://bugs.launchpad.net/or/+bug/1858298 Sound problems when viewer not created in initial conditions
-- bug fix for https://bugs.launchpad.net/or/+bug/1858655 Helpers not throttled to zero when de-MUed
 - analog clocks showing game time, see http://www.elvastower.com/forums/index.php?/topic/29546-station-clocks/ , by jonas
 - bug fix for bad mouse pointing in full screen mode and for issues with Fast full screen-Alt-Tab mode
-- bug fix for https://bugs.launchpad.net/or/+bug/1860263 System.ArgumentException at System.Array.Copy
-- NEW: updated Open Rails web server, by BillC, cjakeman and mbm_OR: many fixes and layout improvements
-- NEW: improvements in Train Driving info window: added multiplayer info, better window motion, save/restore, by mbm_OR
-- NEW: Brazilian Portuguese localization, by Diter Otaviano & William Araújo
-- NEW: bug fix for https://bugs.launchpad.net/or/+bug/1861261 Turntable camera views rotate by 180 degrees.
+- Brazilian Portuguese localization, by Diter Otaviano & William Araújo
+- NEW: allow display of special characters in web client, by mbm_OR
+- NEW: first step of https://blueprints.launchpad.net/or/+spec/expand-potential-of-tcs-scripts : enable AWS TCS
+
 
 
 CREDITS
