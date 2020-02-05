@@ -118,6 +118,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         List<float> SignalDistances = new List<float>();
         List<float> PostSpeedLimits = new List<float>();
         List<float> PostDistances = new List<float>();
+        Aspect SignalAspect;
+        float SignalDistance;
 
         MonitoringDevice VigilanceMonitor;
         MonitoringDevice OverspeedMonitor;
@@ -249,8 +251,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.NextSignalDistanceM = (value) => NextSignalItem<float>(value, ref SignalDistances, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.DoesNextNormalSignalHaveDistanceHead = () => DoesNextNormalSignalHaveDistanceHead();
             Script.DoesNextNormalSignalHaveTwoAspects = () => DoesNextNormalSignalHaveTwoAspects();
-            Script.NextDistanceSignalAspect = () => NextDistanceSignalItem<Aspect>(ref SignalAspects, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
-            Script.NextDistanceSignalDistanceM = () => NextDistanceSignalItem<float>(ref SignalDistances, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
+            Script.NextDistanceSignalAspect = () => NextDistanceSignalItem<Aspect>(ref SignalAspect, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
+            Script.NextDistanceSignalDistanceM = () => NextDistanceSignalItem<float>(ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.CurrentPostSpeedLimitMpS = () => Locomotive.Train.allowedMaxSpeedLimitMpS;
             Script.NextPostSpeedLimitMpS = (value) => NextSignalItem<float>(value, ref PostSpeedLimits, Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST);
             Script.NextPostDistanceM = (value) => NextSignalItem<float>(value, ref PostDistances, Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST);
@@ -450,7 +452,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             return true;
         }
 
-        T NextDistanceSignalItem<T>(ref List<T> list, Train.TrainObjectItem.TRAINOBJECTTYPE type)
+        T NextDistanceSignalItem<T>(ref T retval, Train.TrainObjectItem.TRAINOBJECTTYPE type)
         {
             if (Locomotive.Train.ValidRoute[0] != null && Locomotive.Train.PresentPosition[0].RouteListIndex >= 0)
             {
@@ -461,15 +463,15 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 if (nextSignal.SignalState == ObjectItemInfo.ObjectItemFindState.Object)
                 {
                     Aspect distanceSignalAspect = (Aspect)Locomotive.Train.signalRef.TranslateToTCSAspect(nextSignal.SignalRef.this_sig_lr(Orts.Formats.Msts.MstsSignalFunction.DISTANCE));
-                    SignalAspects.Add(distanceSignalAspect);
-                    SignalDistances.Add(nextSignal.SignalLocation);
-                    return list[0];
+                    SignalAspect = distanceSignalAspect;
+                    SignalDistance = nextSignal.SignalLocation;
+                    return retval;
                 }
             }
 
-            SignalAspects.Add(Aspect.None);
-            SignalDistances.Add(float.MaxValue);
-            return list[0];
+            SignalAspect = Aspect.None;
+            SignalDistance = float.MaxValue;
+            return retval;
         }
 
 
