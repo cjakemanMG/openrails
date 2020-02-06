@@ -65,6 +65,10 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<bool> DoesNextNormalSignalHaveDistanceHead;
         /// <summary>
+        /// Aspect of the DISTANCE heads of next NORMAL signal.
+        /// </summary>
+        public Func<Aspect> NextNormalSignalDistanceHeadsAspect;
+        /// <summary>
         /// Next normal signal has only two aspects (STOP and CLEAR_2).
         /// </summary>
         public Func<bool> DoesNextNormalSignalHaveTwoAspects;

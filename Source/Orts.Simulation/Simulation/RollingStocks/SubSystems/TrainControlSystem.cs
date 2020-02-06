@@ -250,6 +250,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.NextSignalAspect = (value) => NextSignalItem<Aspect>(value, ref SignalAspects, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.NextSignalDistanceM = (value) => NextSignalItem<float>(value, ref SignalDistances, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.DoesNextNormalSignalHaveDistanceHead = () => DoesNextNormalSignalHaveDistanceHead();
+            Script.NextNormalSignalDistanceHeadsAspect = () => NextNormalSignalDistanceHeadsAspect();
             Script.DoesNextNormalSignalHaveTwoAspects = () => DoesNextNormalSignalHaveTwoAspects();
             Script.NextDistanceSignalAspect = () => NextDistanceSignalItem<Aspect>(ref SignalAspect, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.NextDistanceSignalDistanceM = () => NextDistanceSignalItem<float>(ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
@@ -430,6 +431,26 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 }
             }
             return false;
+        }
+
+        private Aspect NextNormalSignalDistanceHeadsAspect()
+        {
+            Aspect distanceSignalAspect = Aspect.None;
+            foreach (var foundItem in Locomotive.Train.SignalObjectItems)
+            {
+                if (foundItem.ObjectType == ObjectItemInfo.ObjectItemType.Signal)
+                {
+                    var signal = foundItem.ObjectDetails;
+                    foreach (var signalHead in signal.SignalHeads)
+                    {
+                        if (signalHead.signalType.FnType == Formats.Msts.MstsSignalFunction.DISTANCE)
+                        {
+                            return distanceSignalAspect = (Aspect)Locomotive.Train.signalRef.TranslateToTCSAspect(signal.this_sig_lr(Orts.Formats.Msts.MstsSignalFunction.DISTANCE));
+                        }
+                    }
+                }
+            }
+            return distanceSignalAspect;
         }
 
         private bool DoesNextNormalSignalHaveTwoAspects()
