@@ -249,7 +249,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.NextSignalSpeedLimitMpS = (value) => NextSignalItem<float>(value, ref SignalSpeedLimits, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.NextSignalAspect = (value) => NextSignalItem<Aspect>(value, ref SignalAspects, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.NextSignalDistanceM = (value) => NextSignalItem<float>(value, ref SignalDistances, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
-            Script.DoesNextNormalSignalHaveDistanceHead = () => DoesNextNormalSignalHaveDistanceHead();
             Script.NextNormalSignalDistanceHeadsAspect = () => NextNormalSignalDistanceHeadsAspect();
             Script.DoesNextNormalSignalHaveTwoAspects = () => DoesNextNormalSignalHaveTwoAspects();
             Script.NextDistanceSignalAspect = () => NextDistanceSignalItem<Aspect>(ref SignalAspect, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
@@ -416,20 +415,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             }
         }
 
-        private bool DoesNextNormalSignalHaveDistanceHead()
-        {
-            var signal = Locomotive.Train.NextSignalObject[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0];
-            if (signal != null)
-            {
-                foreach (var signalHead in signal.SignalHeads)
-                {
-                    if (signalHead.signalType.FnType == Formats.Msts.MstsSignalFunction.DISTANCE)
-                        return true;
-                }
-             }
-            return false;
-        }
-
         private Aspect NextNormalSignalDistanceHeadsAspect()
         {
             var signal = Locomotive.Train.NextSignalObject[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0];
@@ -448,14 +433,15 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         }
 
         private bool DoesNextNormalSignalHaveTwoAspects()
-            // ...and the two aspects are STOP and CLEAR_2
+            // ...and the two aspects are STOP and ( CLEAR_2 or CLEAR_1 )
         {
             var signal = Locomotive.Train.NextSignalObject[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0];
                 if (signal != null)
                 {
                     if (signal.SignalHeads.Count > 1 || signal.SignalHeads[0].signalType.Aspects.Count > 2) return false;
-                    else if ((int)(signal.SignalHeads[0].signalType.Aspects[0].Aspect) == 0 &&
-                            (int)(signal.SignalHeads[0].signalType.Aspects[1].Aspect) == 7) return true;
+                    else if ((int)(signal.SignalHeads[0].signalType.Aspects[0].Aspect) == 0 && 
+                    ((int)(signal.SignalHeads[0].signalType.Aspects[1].Aspect) == 7 ||
+                            (int)(signal.SignalHeads[0].signalType.Aspects[1].Aspect) == 6)) return true;
                     return false;
                 }
             return true;
