@@ -418,35 +418,29 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         private bool DoesNextNormalSignalHaveDistanceHead()
         {
-            foreach (var foundItem in Locomotive.Train.SignalObjectItems)
+            var signal = Locomotive.Train.NextSignalObject[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0];
+            if (signal != null)
             {
-                if (foundItem.ObjectType == ObjectItemInfo.ObjectItemType.Signal)
+                foreach (var signalHead in signal.SignalHeads)
                 {
-                    var signal = foundItem.ObjectDetails;
-                    foreach (var signalHead in signal.SignalHeads)
-                    {
-                        if (signalHead.signalType.FnType == Formats.Msts.MstsSignalFunction.DISTANCE)
-                            return true;
-                    }
+                    if (signalHead.signalType.FnType == Formats.Msts.MstsSignalFunction.DISTANCE)
+                        return true;
                 }
-            }
+             }
             return false;
         }
 
         private Aspect NextNormalSignalDistanceHeadsAspect()
         {
+            var signal = Locomotive.Train.NextSignalObject[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0];
             Aspect distanceSignalAspect = Aspect.None;
-            foreach (var foundItem in Locomotive.Train.SignalObjectItems)
+            if (signal != null)
             {
-                if (foundItem.ObjectType == ObjectItemInfo.ObjectItemType.Signal)
+                foreach (var signalHead in signal.SignalHeads)
                 {
-                    var signal = foundItem.ObjectDetails;
-                    foreach (var signalHead in signal.SignalHeads)
+                    if (signalHead.signalType.FnType == Formats.Msts.MstsSignalFunction.DISTANCE)
                     {
-                        if (signalHead.signalType.FnType == Formats.Msts.MstsSignalFunction.DISTANCE)
-                        {
-                            return distanceSignalAspect = (Aspect)Locomotive.Train.signalRef.TranslateToTCSAspect(signal.this_sig_lr(Orts.Formats.Msts.MstsSignalFunction.DISTANCE));
-                        }
+                        return distanceSignalAspect = (Aspect)Locomotive.Train.signalRef.TranslateToTCSAspect(signal.this_sig_lr(Orts.Formats.Msts.MstsSignalFunction.DISTANCE));
                     }
                 }
             }
@@ -456,20 +450,14 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         private bool DoesNextNormalSignalHaveTwoAspects()
             // ...and the two aspects are STOP and CLEAR_2
         {
-            var signalsFound = 0;
-
-            foreach (var foundItem in Locomotive.Train.SignalObjectItems)
-            {
-                if (foundItem.ObjectType == ObjectItemInfo.ObjectItemType.Signal)
+            var signal = Locomotive.Train.NextSignalObject[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0];
+                if (signal != null)
                 {
-                    signalsFound++;
-                    var signal = foundItem.ObjectDetails;
                     if (signal.SignalHeads.Count > 1 || signal.SignalHeads[0].signalType.Aspects.Count > 2) return false;
                     else if ((int)(signal.SignalHeads[0].signalType.Aspects[0].Aspect) == 0 &&
                             (int)(signal.SignalHeads[0].signalType.Aspects[1].Aspect) == 7) return true;
                     return false;
                 }
-            }
             return true;
         }
 
