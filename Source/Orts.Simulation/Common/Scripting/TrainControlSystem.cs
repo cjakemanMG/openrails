@@ -61,10 +61,6 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<int, float> NextSignalDistanceM;
         /// <summary>
-        /// True if next NORMAL signal has a DISTANCE head.
-        /// </summary>
-        public Func<bool> DoesNextNormalSignalHaveDistanceHead;
-        /// <summary>
         /// Aspect of the DISTANCE heads of next NORMAL signal.
         /// </summary>
         public Func<Aspect> NextNormalSignalDistanceHeadsAspect;
