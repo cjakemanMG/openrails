@@ -1334,17 +1334,18 @@ namespace Orts.Viewer3D.Popups
                     TableSetCell(table, 7, car.HUDBrakeSkid ? Viewer.Catalog.GetString("Yes") : "No");
                     TableSetCell(table, 8, "{0} {1}", FormatStrings.FormatTemperature(car.WheelBearingTemperatureDegC, car.IsMetric, false), car.DisplayWheelBearingTemperatureStatus);
 
-                    TableSetCell(table, 9, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
-
                     // Possibly needed for buffing forces
                     //                TableSetCell(table, 17, "{0}", FormatStrings.FormatForce(car.WagonVerticalDerailForceN, car.IsMetric));
                     //                TableSetCell(table, 18, "{0}", FormatStrings.FormatForce(car.TotalWagonLateralDerailForceN, car.IsMetric));
                     //                TableSetCell(table, 19, car.BuffForceExceeded ? Viewer.Catalog.GetString("Yes") : "No");
 
                     //                TableSetCell(table, 20, "{0:F2}", MathHelper.ToDegrees(car.WagonFrontCouplerAngleRad));
+					
+					
+                    TableSetCell(table, 9, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
                     TableAddLine(table);
                     TableSetCell(table, 1, "Tot.Slack:");
-                    TableSetCell(table, 2, "{0}", FormatStrings.FormatVeryShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
+                    TableSetCell(table, 2, "{0}", FormatStrings.FormatShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
                 }
                 else
                 {
@@ -1369,9 +1370,8 @@ namespace Orts.Viewer3D.Popups
                     TableSetCell(table, 18, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
 
                     TableAddLine(table);
-                    //TableSetCell(table, 11, "Tot {0}", FormatStrings.FormatShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
                     TableSetCell(table, 10, "Tot.Slack:");
-                    TableSetCell(table, 11, "{0}", FormatStrings.FormatVeryShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
+                    TableSetCell(table, 11, "{0}", FormatStrings.FormatShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
                 }
             }
         }
