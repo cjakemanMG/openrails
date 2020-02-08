@@ -1270,7 +1270,8 @@ namespace Orts.Viewer3D.Popups
                 Viewer.Catalog.GetString("Gradient"),
                 Viewer.Catalog.GetString("Curve"),
                 Viewer.Catalog.GetString("Brk Frict."),
-                Viewer.Catalog.GetString("Brk Slide")
+                Viewer.Catalog.GetString("Brk Slide"),
+                Viewer.Catalog.GetString("Bear Temp")
                 //Add new header data here, if adding additional column.
                 // Possibly needed for buffing forces
                 //                Viewer.Catalog.GetString("VertD"),
