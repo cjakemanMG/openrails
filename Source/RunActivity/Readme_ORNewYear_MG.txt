@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.52
-February 4th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.53
+February 9th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -12,7 +12,7 @@ INSTALLATION
 you would return to the official OR version.
 
 RELEASE NOTES
-This unofficial version has been derived from the official Open Rails unstable revision U2020.02.01-0151 (which already includes Monogame)
+This unofficial version has been derived from the official Open Rails unstable revision U2020.02.09-0406 (which already includes Monogame)
 and from the official OpenRails testing revision X1.3.1-123.
 It includes some features not (yet) available in the Open Rails unstable official version, that is:
 - addition of track sounds in the sound debug window (by dennisat)
@@ -31,9 +31,9 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - bug fix for https://bugs.launchpad.net/or/+bug/1858298 Sound problems when viewer not created in initial conditions
 - analog clocks showing game time, see http://www.elvastower.com/forums/index.php?/topic/29546-station-clocks/ , by jonas
 - bug fix for bad mouse pointing in full screen mode and for issues with Fast full screen-Alt-Tab mode
-- Brazilian Portuguese localization, by Diter Otaviano & William Araújo
-- NEW: allow display of special characters in web client, by mbm_OR
-- NEW: first step of https://blueprints.launchpad.net/or/+spec/expand-potential-of-tcs-scripts : enable AWS TCS
+- allow display of special characters in web client, by mbm_OR
+- NEW: further steps of https://blueprints.launchpad.net/or/+spec/expand-potential-of-tcs-scripts : enable AWS TCS
+- NEW: bug fix to display HUD scroll window, by mbm_OR
 
 
 
