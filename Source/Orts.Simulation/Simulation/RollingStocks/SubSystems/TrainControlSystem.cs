@@ -433,17 +433,27 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         }
 
         private bool DoesNextNormalSignalHaveTwoAspects()
-            // ...and the two aspects are STOP and ( CLEAR_2 or CLEAR_1 )
+            // ...and the two aspects of each head are STOP and ( CLEAR_2 or CLEAR_1 or RESTRICTING)
         {
             var signal = Locomotive.Train.NextSignalObject[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0];
-                if (signal != null)
+            if (signal != null)
+            {
+                if (signal.SignalHeads[0].signalType.Aspects.Count > 2) return false;
+                else
                 {
-                    if (signal.SignalHeads.Count > 1 || signal.SignalHeads[0].signalType.Aspects.Count > 2) return false;
-                    else if ((int)(signal.SignalHeads[0].signalType.Aspects[0].Aspect) == 0 && 
-                    ((int)(signal.SignalHeads[0].signalType.Aspects[1].Aspect) == 7 ||
-                            (int)(signal.SignalHeads[0].signalType.Aspects[1].Aspect) == 6)) return true;
-                    return false;
+                    foreach (var signalHead in signal.SignalHeads)
+                    {
+                        if (signalHead.signalType.FnType != Formats.Msts.MstsSignalFunction.DISTANCE &&
+                            signalHead.signalType.Aspects.Count == 2 &&
+                            (int)(signalHead.signalType.Aspects[0].Aspect) == 0 &&
+                                ((int)(signalHead.signalType.Aspects[1].Aspect) == 7 ||
+                                (int)(signalHead.signalType.Aspects[1].Aspect) == 6 ||
+                                (int)(signalHead.signalType.Aspects[1].Aspect) == 2)) continue;
+                        else return false;
+                    }
+                    return true;
                 }
+            }
             return true;
         }
 
