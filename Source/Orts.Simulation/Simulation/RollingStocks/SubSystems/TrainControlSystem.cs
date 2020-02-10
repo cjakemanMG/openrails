@@ -132,6 +132,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool CircuitBreakerOpeningOrder { get; private set; }
         public bool TractionAuthorization { get; private set; }
 
+        // generic TCS commands
+        public bool[] TCSButtonCommandPressed { get; private set; }
+
         string ScriptName;
         string SoundFileName;
         string ParametersFileName;
@@ -584,6 +587,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             HandleEvent(TCSEvent.AlerterReset);
         }
 
+        public void TCSCommandPressed(bool pressed, int commandIndex)
+        {
+            TCSButtonCommandPressed[commandIndex] = pressed;
+            HandleEvent(pressed ? TCSEvent.GenericTCSEvent : TCSEvent.GenericTCSEvent, commandIndex);
+        }
+
         public void SetEmergency(bool emergency)
         {
             if (Script != null)
@@ -601,6 +610,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         {
             if (Script != null)
                 Script.HandleEvent(evt, message);
+        }
+
+        public void HandleEvent(TCSEvent evt, int eventIndex)
+        {
+            if (Script != null)
+                Script.HandleEvent(evt, eventIndex);
         }
 
         private T LoadParameter<T>(string sectionName, string keyName, T defaultValue)
@@ -943,6 +958,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public override void SetEmergency(bool emergency)
         {
             ExternalEmergency = emergency;
+        }
+
+        public override void HandleEvent(TCSEvent evt, int eventIndex)
+        {
+            
         }
 
         void UpdateVigilance()
