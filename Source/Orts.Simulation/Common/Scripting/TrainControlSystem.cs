@@ -329,12 +329,6 @@ namespace ORTS.Scripting.Api
         /// Called by signalling code externally to stop the train in certain circumstances.
         /// </summary>
         public abstract void SetEmergency(bool emergency);
-        /// <summary>
-        /// Called when an event happens (like the alerter button pressed)
-        /// </summary>
-        /// <param name="evt">The event happened</param>
-        /// <param name="eventIndex">The index of the generic TCS event</param>
-        public abstract void HandleEvent(TCSEvent evt, int eventIndex);
     }
 
     // Represents the same enum as TrackMonitorSignalAspect

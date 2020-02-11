@@ -615,7 +615,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public void HandleEvent(TCSEvent evt, int eventIndex)
         {
             if (Script != null)
-                Script.HandleEvent(evt, eventIndex);
+            {
+                var message = eventIndex.ToString();
+                Script.HandleEvent(evt, message);
+            }
         }
 
         private T LoadParameter<T>(string sectionName, string keyName, T defaultValue)
@@ -958,11 +961,6 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public override void SetEmergency(bool emergency)
         {
             ExternalEmergency = emergency;
-        }
-
-        public override void HandleEvent(TCSEvent evt, int eventIndex)
-        {
-            
         }
 
         void UpdateVigilance()
