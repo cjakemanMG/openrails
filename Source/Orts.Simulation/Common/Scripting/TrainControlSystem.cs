@@ -295,6 +295,10 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Action<Aspect> SetNextSignalAspect;
         /// <summary>
+        /// Will be whown on ASPECT_DISPLAY cabcontrol.
+        /// </summary>
+        public Action<int, float> SetCabDisplayControl;
+        /// <summary>
         /// Get bool parameter in the INI file.
         /// </summary>
         public Func<string, string, bool, bool> GetBoolParameter;

@@ -1875,6 +1875,10 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_LEFTDOOR:
                 case CABViewControlTypes.ORTS_RIGHTDOOR:
                 case CABViewControlTypes.ORTS_MIRRORS:
+                    index = (int)data;
+                    break;
+
+                // Train Control System controls
                 case CABViewControlTypes.ORTS_TCS1:
                 case CABViewControlTypes.ORTS_TCS2:
                 case CABViewControlTypes.ORTS_TCS3:
@@ -1907,7 +1911,7 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_TCS30:
                 case CABViewControlTypes.ORTS_TCS31:
                 case CABViewControlTypes.ORTS_TCS32:
-                    index = (int)data;
+                    index = (int)(Locomotive.TrainControlSystem.CabDisplayControls[(int)Control.ControlType - (int)CABViewControlTypes.ORTS_TCS1]);
                     break;
             }
             // If it is a control with NumPositions and NumValues, the index becomes the reference to the Positions entry, which in turn is the frame index within the .ace file
@@ -2080,7 +2084,6 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_TCS14:
                 case CABViewControlTypes.ORTS_TCS15:
                 case CABViewControlTypes.ORTS_TCS16:
-                    var subString = (Control.ControlType.ToString()).Substring(8);
                     int commandIndex = (int)Control.ControlType - (int)CABViewControlTypes.ORTS_TCS1;
                     new TCSCommand(Viewer.Log, ChangedValue(Locomotive.TrainControlSystem.TCSButtonCommandPressed[commandIndex] ? 1 : 0) > 0, commandIndex);
                     break;

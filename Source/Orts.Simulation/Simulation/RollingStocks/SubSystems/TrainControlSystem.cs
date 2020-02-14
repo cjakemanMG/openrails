@@ -132,6 +132,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool CircuitBreakerOpeningOrder { get; private set; }
         public bool TractionAuthorization { get; private set; }
 
+        public float[] CabDisplayControls = new float[32];
+
         // generic TCS commands
         public bool[] TCSButtonCommandPressed { get; private set; }
 
@@ -339,6 +341,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.SetNextSpeedLimitMpS = (value) => this.NextSpeedLimitMpS = value;
             Script.SetInterventionSpeedLimitMpS = (value) => this.InterventionSpeedLimitMpS = value;
             Script.SetNextSignalAspect = (value) => this.CabSignalAspect = (TrackMonitorSignalAspect)value;
+            Script.SetCabDisplayControl = (arg1, arg2) => CabDisplayControls[arg1] = arg2;
 
             // TrainControlSystem INI configuration file
             Script.GetBoolParameter = (arg1, arg2, arg3) => LoadParameter<bool>(arg1, arg2, arg3);
