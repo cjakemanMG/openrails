@@ -339,10 +339,11 @@ namespace Orts.Simulation.RollingStocks
         public bool EmergencyEngagesHorn { get; private set; }
         public bool WheelslipCausesThrottleDown { get; private set; }
 
+        public float BrakeRestoresPowerAtBrakePipePressurePSI;
+        public float BrakeCutsPowerAtBrakePipePressurePSI;
         public bool DoesVacuumBrakeCutPower { get; private set; }
         public bool DoesBrakeCutPower { get; private set; }
-        public float BrakeCutsPowerAtBrakePipePressurePSI { get; private set; }
-        public float BrakeRestoresPowerAtBrakePipePressurePSI { get; private set; }
+        public float BrakeCutsPowerAtBrakeCylinderPressurePSI { get; private set; }
         public bool DoesHornTriggerBell { get; private set; }
 
         protected const float DefaultCompressorRestartToMaxSysPressureDiff = 35;    // Used to check if difference between these two .eng parameters is correct, and to correct it
@@ -389,6 +390,7 @@ namespace Orts.Simulation.RollingStocks
           //  BrakePipeChargingRatePSIpS = Simulator.Settings.BrakePipeChargingRate;
                         
             MilepostUnitsMetric = Simulator.TRK.Tr_RouteFile.MilepostUnitsMetric;
+            BrakeCutsPowerAtBrakeCylinderPressurePSI = 4.0f;
 
             LocomotiveAxle = new Axle();
             LocomotiveAxle.DriveType = AxleDriveType.ForceDriven;
@@ -811,8 +813,8 @@ namespace Orts.Simulation.RollingStocks
                 case "engine(sanding": SanderSpeedOfMpS = stf.ReadFloatBlock(STFReader.UNITS.Speed, 30.0f); break;
                 case "engine(ortsdoesvacuumbrakecutpower": DoesVacuumBrakeCutPower = stf.ReadBoolBlock(false); break;
                 case "engine(doesbrakecutpower": DoesBrakeCutPower = stf.ReadBoolBlock(false); break;
+                case "engine(brakecutspoweratbrakecylinderpressure": BrakeCutsPowerAtBrakeCylinderPressurePSI = stf.ReadFloatBlock(STFReader.UNITS.PressureDefaultPSI, null); break;
                 case "engine(ortsbrakecutspoweratbrakepipepressure": BrakeCutsPowerAtBrakePipePressurePSI = stf.ReadFloatBlock(STFReader.UNITS.PressureDefaultPSI, null); break;
-                case "engine(brakecutspoweratbrakecylinderpressure": BrakeCutsPowerAtBrakePipePressurePSI = stf.ReadFloatBlock(STFReader.UNITS.PressureDefaultPSI, null); break;
                 case "engine(ortsbrakerestorespoweratbrakepipepressure": BrakeRestoresPowerAtBrakePipePressurePSI = stf.ReadFloatBlock(STFReader.UNITS.PressureDefaultPSI, null); break;
                 case "engine(doeshorntriggerbell": DoesHornTriggerBell = stf.ReadBoolBlock(false); break;
                 case "engine(brakesenginecontrollers":
@@ -1242,16 +1244,26 @@ namespace Orts.Simulation.RollingStocks
             if ((BrakeSystem is VacuumSinglePipe) && ( BrakeCutsPowerAtBrakePipePressurePSI == 0 || BrakeCutsPowerAtBrakePipePressurePSI > OneAtmospherePSI))
             {
                 BrakeCutsPowerAtBrakePipePressurePSI = Bar.ToPSI(Bar.FromInHg(12.5f)); // Power is cut @ 12.5 InHg
+
+                // TODO - set for verbose messaging option
+                Trace.TraceInformation("BrakeCutsPowerAtBrakePipePressure appears out of limits, and has been set to value of {0} InHg", BrakeCutsPowerAtBrakePipePressurePSI);
             }
-            else
-            {
-                BrakeCutsPowerAtBrakePipePressurePSI = 4.0f; // Air brake default
-            }
+
             if ((BrakeSystem is VacuumSinglePipe) && ( BrakeRestoresPowerAtBrakePipePressurePSI == 0 || BrakeRestoresPowerAtBrakePipePressurePSI > OneAtmospherePSI))
             {
                 BrakeRestoresPowerAtBrakePipePressurePSI = Bar.ToPSI(Bar.FromInHg(15.0f)); // Power can be resotred once brake pipe rises above 15 InHg
+                
+                // TODO - set for verbose messaging option
+                Trace.TraceInformation("BrakeRestoresPowerAtBrakePipePressure appears out of limits, and has been set to value of {0} InHg", BrakeRestoresPowerAtBrakePipePressurePSI);
             }
-            
+
+            if (BrakeCutsPowerAtBrakePipePressurePSI > BrakeRestoresPowerAtBrakePipePressurePSI)
+            {
+                BrakeCutsPowerAtBrakePipePressurePSI = BrakeRestoresPowerAtBrakePipePressurePSI - 1.0f;
+                // TODO - set for verbose messaging option
+                Trace.TraceInformation("BrakeCutsPowerAtBrakePipePressure is greater then BrakeRestoresPowerAtBrakePipePressurePSI, and has been set to value of {0} InHg", BrakeCutsPowerAtBrakePipePressurePSI);
+
+            }
 
             // Initialise Brake Time Factor
             if (BrakePipeTimeFactorS == 0) // Check to see if BrakePipeTimeFactorS has been set in the ENG file.
@@ -2387,7 +2399,7 @@ namespace Orts.Simulation.RollingStocks
         /// The standard Cutius-Kniffler formula for dry rail is used as a base.
         /// Dry track = 0.33 
         /// 
-        /// The following values have been used as an "appropriate common" standard  to vary the above value by (sourced from Principles and Applications of Tribology).
+        /// The following values are indicatitive values only (sourced from Principles and Applications of Tribology).
         /// Wet track (clean) = 0.18 <=> 0.2
         /// Wet track (sand) = 0.22 <=> 0.25
         /// Dew or fog = 0.09 <=> 0.15
@@ -2401,7 +2413,7 @@ namespace Orts.Simulation.RollingStocks
         public virtual void UpdateFrictionCoefficient(float elapsedClockSeconds)
         {
             float BaseuMax = (Curtius_KnifflerA / (MpS.ToKpH(AbsSpeedMpS) + Curtius_KnifflerB) + Curtius_KnifflerC); // Base Curtius - Kniffler equation - u = 0.33, all other values are scaled off this formula
-
+            float SandingFrictionCoefficientFactor = 0.0f;
             //Set the friction coeff due to weather
             if (Simulator.WeatherType == WeatherType.Rain || Simulator.WeatherType == WeatherType.Snow)
             {
@@ -2423,9 +2435,9 @@ namespace Orts.Simulation.RollingStocks
                         float pric = Simulator.Weather.PricipitationIntensityPPSPM2 * 1000;
                         // precipitation will calculate a value between 0.15 (light rain) and 0.2 (heavy rain) - this will be a factor that is used to adjust the base value - assume linear value between upper and lower precipitation values
                         if (pric >= 0.5)
-                            BaseFrictionCoefficientFactor = Math.Min((pric * 0.0078f + 0.45f), 0.8f);
+                            BaseFrictionCoefficientFactor = Math.Min((pric * 0.0078f + 0.45f), 0.8f); // should give a minimum value between 0.8 and 1.0
                         else
-                            BaseFrictionCoefficientFactor = 0.4539f + 1.0922f * (0.5f - pric);
+                            BaseFrictionCoefficientFactor = Math.Min((0.4539f + 1.0922f * (0.5f - pric)), 0.8f); // should give a minimum value between 0.8 and 1.0
                     }
                     else // if not proportional to precipitation use fixed friction value of 0.8 x friction coefficient of 0.33
                     {
@@ -2435,6 +2447,28 @@ namespace Orts.Simulation.RollingStocks
                 else     // Snow weather
                 {
                     BaseFrictionCoefficientFactor = 0.6f;
+                }
+
+                //add sander - more effective in wet weather, so increases adhesion by more
+                if (AbsSpeedMpS < SanderSpeedOfMpS && TrackSandBoxCapacityFt3 > 0.0 && MainResPressurePSI > 80.0 && (AbsSpeedMpS > 0))
+                {
+                    if (SanderSpeedEffectUpToMpS > 0.0f)
+                    {
+                        if ((Sander) && (AbsSpeedMpS < SanderSpeedEffectUpToMpS))
+                        {
+                            SandingFrictionCoefficientFactor = (1.0f - 0.5f / SanderSpeedEffectUpToMpS * AbsSpeedMpS) * 1.75f;
+                            BaseFrictionCoefficientFactor *= SandingFrictionCoefficientFactor;
+                            
+                        }
+                    }
+                    else
+                    {
+                        if (Sander)  // If sander is on, and train speed is greater then zero, then put sand on the track
+                        {
+                            SandingFrictionCoefficientFactor = 1.75f;
+                            BaseFrictionCoefficientFactor *= SandingFrictionCoefficientFactor; // Sanding track adds approx 175% adhesion (best case)
+                        }
+                    }
                 }
             }
             else // Default to Dry (Clear) weather
@@ -2449,7 +2483,7 @@ namespace Orts.Simulation.RollingStocks
                     }
                     else
                     {
-                        BaseFrictionCoefficientFactor = Math.Min((fog * 2.75e-4f + 0.45f), 1.0f); // If fog is less then 2km then it will impact friction
+                        BaseFrictionCoefficientFactor = Math.Min((fog * 2.75e-4f + 0.8f), 0.8f); // If fog is less then 2km then it will impact friction, decrease adhesion by up to 20% (same as clear to wet transition)
                     }                                        
                 }
                 else // if not proportional to fog use fixed friction value approximately equal to 0.33, thus factor will be 1.0 x friction coefficient of 0.33
@@ -2457,6 +2491,26 @@ namespace Orts.Simulation.RollingStocks
                     BaseFrictionCoefficientFactor = 1.0f;
                 }
 
+                //add sander - not as effective in dry weather
+                if (AbsSpeedMpS < SanderSpeedOfMpS && TrackSandBoxCapacityFt3 > 0.0 && MainResPressurePSI > 80.0 && (AbsSpeedMpS > 0))
+                {
+                    if (SanderSpeedEffectUpToMpS > 0.0f)
+                    {
+                        if ((Sander) && (AbsSpeedMpS < SanderSpeedEffectUpToMpS))
+                        {
+                            SandingFrictionCoefficientFactor = (1.0f - 0.5f / SanderSpeedEffectUpToMpS * AbsSpeedMpS) * 1.25f;
+                            BaseFrictionCoefficientFactor *= SandingFrictionCoefficientFactor;
+                        }
+                    }
+                    else
+                    {
+                        if (Sander)  // If sander is on, and train speed is greater then zero, then put sand on the track
+                        {
+                            SandingFrictionCoefficientFactor = 1.25f;
+                            BaseFrictionCoefficientFactor *= SandingFrictionCoefficientFactor; // Sanding track adds approx 125% adhesion (best case)
+                        }
+                    }
+                }
             }
 
             // For wagons use base Curtius-Kniffler adhesion factor - u = 0.33
@@ -2474,32 +2528,13 @@ namespace Orts.Simulation.RollingStocks
 
             }
 
-            if (WheelSlip && ThrottlePercent > 0.2f && !BrakeSkid)   // Test to see if loco wheel is slipping, then coeff of friction will be decreased below static value.
+            if (WheelSlip && ThrottlePercent > 0.2f && !BrakeSkid)   // Test to see if loco wheel is slipping, then coeff of friction will be decreased below static value. Sanding will override this somewhat
             {
-                BaseFrictionCoefficientFactor = 0.15f;  // Descrease friction to take into account dynamic (kinetic) friction U = 0.0525
+                BaseFrictionCoefficientFactor = 0.15f * SandingFrictionCoefficientFactor;  // Descrease friction to take into account dynamic (kinetic) friction U = 0.0525
             }
             else if (WheelSlip && ThrottlePercent < 0.1f && BrakeSkid) // Test to see if loco wheel is skidding due to brake application
             {
-                BaseFrictionCoefficientFactor = 0.15f;  // Descrease friction to take into account dynamic (kinetic) friction U = 0.0525
-            }
-
-            //add sander
-            if (AbsSpeedMpS < SanderSpeedOfMpS && TrackSandBoxCapacityFt3 > 0.0 && MainResPressurePSI > 80.0 && (AbsSpeedMpS > 0))
-            {
-                if (SanderSpeedEffectUpToMpS > 0.0f)
-                {
-                    if ((Sander) && (AbsSpeedMpS < SanderSpeedEffectUpToMpS))
-                    {
-                        BaseFrictionCoefficientFactor *= (1.0f - 0.5f / SanderSpeedEffectUpToMpS * AbsSpeedMpS) * 1.5f;
-                    }
-                }
-                else
-                {
-                    if (Sander)  // If sander is on, and train speed is greater then zero, then put sand on the track
-                    {
-                        BaseFrictionCoefficientFactor *= 1.5f; // Sanding track adds approx 150% adhesion (best case)
-                    }
-                }
+                BaseFrictionCoefficientFactor = 0.15f * SandingFrictionCoefficientFactor;  // Descrease friction to take into account dynamic (kinetic) friction U = 0.0525
             }
 
             var AdhesionMultiplier = Simulator.Settings.AdhesionFactor / 100.0f; // Convert to a factor where 100% = no change to adhesion
