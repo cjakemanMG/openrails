@@ -135,7 +135,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float[] CabDisplayControls = new float[32];
 
         // generic TCS commands
-        public bool[] TCSButtonCommandPressed { get; private set; }
+        public bool[] TCSButtonCommandPressed = new bool[32];
 
         string ScriptName;
         string SoundFileName;
