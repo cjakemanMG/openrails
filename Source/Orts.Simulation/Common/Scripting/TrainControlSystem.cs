@@ -396,9 +396,13 @@ namespace ORTS.Scripting.Api
         /// </summary>
         HornActivated,
         /// <summary>
-        /// Generic TCS event.
+        /// Generic TCS button pressed.
         /// </summary>
-        GenericTCSEvent,
+        GenericTCSButtonPressed,
+        /// <summary>
+        /// Generic TCS button released.
+        /// </summary>
+        GenericTCSButtonReleased,
     }
 
     /// <summary>

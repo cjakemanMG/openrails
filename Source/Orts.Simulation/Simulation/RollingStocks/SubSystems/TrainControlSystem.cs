@@ -593,7 +593,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public void TCSCommandPressed(bool pressed, int commandIndex)
         {
             TCSButtonCommandPressed[commandIndex] = pressed;
-            HandleEvent(pressed ? TCSEvent.GenericTCSEvent : TCSEvent.GenericTCSEvent, commandIndex);
+            HandleEvent(pressed ? TCSEvent.GenericTCSButtonPressed : TCSEvent.GenericTCSButtonReleased, commandIndex);
         }
 
         public void SetEmergency(bool emergency)
