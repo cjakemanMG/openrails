@@ -152,6 +152,10 @@ namespace ORTS.Scripting.Api
         /// Train brake pressure value which triggers the power cut-off.
         /// </summary>
         public Func<float> BrakeCutsPowerAtBrakeCylinderPressureBar;
+        /// <summary>
+        /// Line speed taken from .trk file.
+        /// </summary>
+        public Func<float> LineSpeedMpS;
 
         // TODO: The following will be available in .NET 4 as normal Func:
         public delegate TResult Func5<T1, T2, T3, T4, T5, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
