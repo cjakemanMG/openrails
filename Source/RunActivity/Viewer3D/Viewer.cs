@@ -1352,7 +1352,8 @@ namespace Orts.Viewer3D
                     if (MousePickedControl != null & MousePickedControl != OldMousePickedControl)
                     {
                         // say what control you have here
-                        Simulator.Confirmer.Message(ConfirmLevel.None, MousePickedControl.GetControlType().ToString());
+                        Simulator.Confirmer.Message(ConfirmLevel.None,
+                            (PlayerLocomotive as MSTSLocomotive).TrainControlSystem.GetDisplayString(MousePickedControl.GetControlType().ToString()));
                     }
                     if (MousePickedControl != null) ActualCursor = Cursors.Hand;
                     else if (ActualCursor == Cursors.Hand) ActualCursor = Cursors.Default;
@@ -1474,7 +1475,8 @@ namespace Orts.Viewer3D
                     if (MousePickedControl != null & MousePickedControl != OldMousePickedControl)
                     {
                         // say what control you have here
-                        Simulator.Confirmer.Message(ConfirmLevel.None, MousePickedControl.GetControlType().ToString());
+                        Simulator.Confirmer.Message(ConfirmLevel.None,
+                            (PlayerLocomotive as MSTSLocomotive).TrainControlSystem.GetDisplayString(MousePickedControl.GetControlType().ToString()));
                     }
                     if (MousePickedControl != null)
                     {
