@@ -278,6 +278,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.DoesBrakeCutPower = () => Locomotive.DoesBrakeCutPower;
             Script.BrakeCutsPowerAtBrakeCylinderPressureBar = () => Bar.FromPSI(Locomotive.BrakeCutsPowerAtBrakeCylinderPressurePSI);
             Script.LineSpeedMpS = () => (float)Simulator.TRK.Tr_RouteFile.SpeedLimit;
+            Script.DoesStartFromTerminalStation = () => DoesStartFromTerminalStation();
 
             // TrainControlSystem functions
             Script.SpeedCurve = (arg1, arg2, arg3, arg4, arg5) => SpeedCurve(arg1, arg2, arg3, arg4, arg5);
@@ -484,6 +485,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             SignalAspect = Aspect.None;
             SignalDistance = float.MaxValue;
             return retval;
+        }
+
+        private bool DoesStartFromTerminalStation()
+        {
+            var tempTraveller = new Traveller(Locomotive.Train.RearTDBTraveller);
+            tempTraveller.ReverseDirection();
+            return tempTraveller.NextTrackNode() && tempTraveller.IsEnd;
         }
 
 

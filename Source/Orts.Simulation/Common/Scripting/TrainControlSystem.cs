@@ -156,6 +156,10 @@ namespace ORTS.Scripting.Api
         /// Line speed taken from .trk file.
         /// </summary>
         public Func<float> LineSpeedMpS;
+        /// <summary>
+        /// True if starting from terminal station (no track behind the train).
+        /// </summary>
+        public Func<bool> DoesStartFromTerminalStation;
 
         // TODO: The following will be available in .NET 4 as normal Func:
         public delegate TResult Func5<T1, T2, T3, T4, T5, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
