@@ -1911,7 +1911,7 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_TCS30:
                 case CABViewControlTypes.ORTS_TCS31:
                 case CABViewControlTypes.ORTS_TCS32:
-                    index = (int)(Locomotive.TrainControlSystem.CabDisplayControls[(int)Control.ControlType - (int)CABViewControlTypes.ORTS_TCS1]);
+                    index = (int)data;
                     break;
             }
             // If it is a control with NumPositions and NumValues, the index becomes the reference to the Positions entry, which in turn is the frame index within the .ace file
