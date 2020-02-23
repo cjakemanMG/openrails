@@ -2085,7 +2085,8 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.ORTS_TCS15:
                 case CABViewControlTypes.ORTS_TCS16:
                     int commandIndex = (int)Control.ControlType - (int)CABViewControlTypes.ORTS_TCS1;
-                    new TCSCommand(Viewer.Log, ChangedValue(Locomotive.TrainControlSystem.TCSButtonCommandPressed[commandIndex] ? 1 : 0) > 0, commandIndex);
+                    if (ChangedValue(1) > 0 ^ Locomotive.TrainControlSystem.TCSCommandButtonDown[commandIndex])
+                        new TCSCommand(Viewer.Log, !Locomotive.TrainControlSystem.TCSCommandButtonDown[commandIndex], commandIndex);
                     break;
 
             }

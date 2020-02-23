@@ -135,7 +135,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float[] CabDisplayControls = new float[32];
 
         // generic TCS commands
-        public bool[] TCSButtonCommandPressed = new bool[16];
+        public bool[] TCSCommandButtonDown = new bool[16];
         // List of customized control strings;
         public List<string> CustomizedTCSControlStrings = new List<string>();
 
@@ -606,7 +606,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
         public void TCSCommandPressed(bool pressed, int commandIndex)
         {
-            TCSButtonCommandPressed[commandIndex] = pressed;
+            TCSCommandButtonDown[commandIndex] = pressed;
             HandleEvent(pressed ? TCSEvent.GenericTCSButtonPressed : TCSEvent.GenericTCSButtonReleased, commandIndex);
         }
 
