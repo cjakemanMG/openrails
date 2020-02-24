@@ -189,7 +189,7 @@ namespace Orts.Viewer3D.Popups
      
         public static int DbfEvalOverSpeed;//Debrief eval
         bool istrackColorRed = false;//Debrief eval
-        public static Double DbfEvalOverSpeedTimeS = 0;//Debrief eval
+        public static double DbfEvalOverSpeedTimeS = 0;//Debrief eval
         public static double DbfEvalIniOverSpeedTimeS = 0;//Debrief eval
 
         Train.TrainInfo validInfo;

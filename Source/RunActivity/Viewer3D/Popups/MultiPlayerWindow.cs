@@ -88,7 +88,7 @@ namespace Orts.Viewer3D.Popups
             { "??!", Color.Green },
             { "?!!", Color.PaleGreen },
             { "$$$", Color.LightSkyBlue},
-            { "$??", Color.Cyan}
+            { "%%%", Color.Cyan}
         };
 
         public MultiPlayerWindow(WindowManager owner)

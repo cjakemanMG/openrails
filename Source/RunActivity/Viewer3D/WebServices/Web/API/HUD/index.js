@@ -1,4 +1,4 @@
-// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014 by the Open Rails project.
+﻿// COPYRIGHT 2009, 2010, 2011, 2012, 2013, 2014 by the Open Rails project.
 //
 // This file is part of Open Rails.
 //
@@ -56,7 +56,8 @@ function api() {
 			{
 				var rows = obj.commonTable.nRows;
 				var cols = obj.commonTable.nCols;
-				Str = "<table>";  
+				Str = "<table>";
+				var codeColor = ['???','!!!','%%%','$$$'];
 				var next = 0;
 				var endIndex = 0;
 				var newData = "";
@@ -66,21 +67,13 @@ function api() {
 						if (obj.commonTable.values[next] != null) {
 							endIndex = obj.commonTable.values[next].length;
 							newData = obj.commonTable.values[next].slice(0, endIndex -3);
+							stringColor = obj.commonTable.values[next].slice(-3);
 						}
 						if (obj.commonTable.values[next] == null) {
 							Str += "<td></td>";
 						}
-						else if (obj.commonTable.values[next].slice(-3) == "???") {
-							Str += "<td style='color:#ffff00'>" +  newData + "</td>";//Yellow
-						}
-						else if (obj.commonTable.values[next].slice(-3) == "!!!") {
-							Str += "<td style='color:#ff4500'>" +  newData + "</td>";//OrangeRed
-						}
-						else if (obj.commonTable.values[next].slice(-3) == "%%%") {
-							Str += "<td style='color:#00ffff'>" +  newData + "</td>";//Cyan
-						}
-						else if (obj.commonTable.values[next].slice(-3) == "$$$") {
-							Str += "<td style='color:#ffc0cb'>" +  newData + "</td>";//Pink
+						else if (codeColor.indexOf(stringColor) != -1) {
+							Str += "<td ColorCode =" + stringColor + ">" + newData + "</td>";
 						}
 						else {
 							Str += "<td>" + obj.commonTable.values[next] + "</td>";
@@ -92,35 +85,95 @@ function api() {
 				Str += "</table>";
 				HUDCommon.innerHTML = Str;
 
+				// Clear HUDExtra when Common is selected
+				if (obj.nTables == 1) {
+					Str = "<table style='display:none'>";
+					HUDExtra.innerHTML = Str;
+				}
+
 				if (obj.nTables == 2) {
-					var rows = obj.extraTable.nRows;
-					var cols = obj.extraTable.nCols;
+					var rows = obj.extraTable.nRows,
+						cols = obj.extraTable.nCols;
+
 					next = 0;
-					Str = "<table>";  
+					Str = "<table>";
+					// Arrays used with .indexOf() function
+					// Debug information
+					var DebugColSpanTo10 = ['Build','CPU','GPU','Adapter'],
+						DebugColSpanTo3 = ['Render process','Updater process','Loader process','Sound process','Total process'],
+						DebugWidthTofix = ['primitives','Camera'],
+					// Force information
+						ForceColSpanTo4 = ['(Simple adhesion model)','Dynamic brake'],
+						ForceColSpanTo3 = ['Axle out force','Loco Adhesion','Wagon Adhesion'],
+					// Brake information
+						BrakeColSpanTo2 = ['PlayerLoco','Brake Sys Vol'];
+
 					for (var row = 0; row < obj.extraTable.nRows; ++row) {
 						Str += "<tr>";
+						var colspanmax = false,
+							colspan10 = false,
+							colspan3 = false,
+							fixwidth = false,
+							locomotivetype = false;
+						
 						for (var col=0; col < obj.extraTable.nCols; ++col) { 
+							// Required variables for the text color management
 							if (obj.extraTable.values[next] != null) {
 								endIndex = obj.extraTable.values[next].length;
 								newData = obj.extraTable.values[next].slice(0, endIndex -3);
+								stringColor = obj.extraTable.values[next].slice(-3);
 							}
 							if (obj.extraTable.values[next] == null) {
 								Str += "<td></td>";
 							}
-							else if (obj.extraTable.values[next].slice(-3) == "???") {
-								Str += "<td style='color:#ffff00'>" +  newData + "</td>";//Yellow
+							// Changes the first row to title format
+							else if (obj.extraTable.values[next].indexOf('INFORMATION') !== -1) {
+								Str += "<th align='left' colspan='9' >" + obj.extraTable.values[next] + "</th>";
 							}
-							else if (obj.extraTable.values[next].slice(-3) == "!!!") {
-								Str += "<td style='color:#ff4500'>" +  newData + "</td>";//OrangeRed
+							// Apply color
+							else if (codeColor.indexOf(stringColor) != -1) {
+								Str += "<td ColorCode =" + stringColor + ">" + newData + "</td>";
 							}
-							else if (obj.extraTable.values[next].slice(-3) == "%%%") {
-								Str += "<td style='color:#00ffff'>" +  newData + "</td>";//Cyan
+							// Customized colspan
+							else if (colspanmax || (locomotivetype && obj.extraTable.values[next].length > 5) ){
+								locomotivetype = false;
+								Str += "<td class ='td_nowrap' colspan='15' >" + obj.extraTable.values[next] + "</td>";
 							}
-							else if (obj.extraTable.values[next].slice(-3) == "$$$") {
-								Str += "<td style='color:#ffc0cb'>" +  newData + "</td>";//Pink
+							else if (obj.extraTable.values[next].indexOf('Locomotive') !== -1){
+								locomotivetype = true;
+								Str += "<td colspan='2' >" + obj.extraTable.values[next] + "</td>";
+							}
+							else if (colspan3 || BrakeColSpanTo2.indexOf(obj.extraTable.values[next]) !== -1){
+								Str += "<td colspan='3' >" + obj.extraTable.values[next] + "</td>";
+							}
+							else if (colspan10){
+								Str += "<td class ='td_nowrap' colspan='10' >" + obj.extraTable.values[next] + "</td>";
+							}
+							else if (fixwidth){
+								Str += "<td class='td_nowrap' >" + obj.extraTable.values[next] + "</td>";
+							}
+							// Force info requires colspan into first col
+							else if (ForceColSpanTo4.indexOf(obj.extraTable.values[next]) !== -1 || obj.extraTable.values[next].indexOf('===') !== -1){ // Locomotive info
+								Str += "<td colspan='4' >" + obj.extraTable.values[next] + "</td>";
+							}
+							else if (ForceColSpanTo3.indexOf(obj.extraTable.values[next]) !== -1 ){
+								Str += "<td colspan='3' >" + obj.extraTable.values[next] + "</td>";
 							}
 							else {
-								Str += "<td>"  + obj.extraTable.values[next] + "</td>";
+								// Apply colspan if required after first col
+								if (obj.extraTable.values[next].indexOf('Memory') !== -1){
+									colspanmax = true;
+								}
+								if (DebugColSpanTo10.indexOf(obj.extraTable.values[next]) !== -1){
+									colspan10 = true;
+								}
+								if (DebugColSpanTo3.indexOf(obj.extraTable.values[next]) !== -1){
+									colspan3 = true;
+								}
+								if (DebugWidthTofix.indexOf(obj.extraTable.values[next]) !== -1){
+									fixwidth = true;
+								}
+								Str += "<td class='td_nowrap'>" + obj.extraTable.values[next].trim() + "</td>";
 							}
 							++next;
 						}

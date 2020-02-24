@@ -1,0 +1,73 @@
+#table {
+	padding: 20px; 
+}
+/* Apply rounded border */
+.border{	
+	border: gray 2px solid;
+	border-radius: 20px;
+	/*padding: 5px;*/
+}
+.button{
+	border: gray 2px solid;
+	border-radius: 20px;
+	text-align: center;
+	display: inline-block;
+	margin: 4px 2px;	
+}
+.day{
+    background-color: white;
+    color: black;
+}
+.night{
+    background-color: black;
+    color: white;
+}
+
+/* Allows to apply text color */
+td[ColorCode= "???"]{
+	background-color:black;
+	color:yellow;
+}
+td[ColorCode= "??!"]{
+	background-color:black;
+	color:Green;
+}
+td[ColorCode= "?!?"]{
+	background-color:black;
+	color:Black;
+}
+td[ColorCode= "?!!"]{
+	background-color:black;
+	color:PaleGreen;
+}
+td[ColorCode= "!??"]{
+	background-color:black;
+	color:White;
+}
+td[ColorCode= "!!?"]{
+	background-color:black;
+	color:Orange;
+}
+td[ColorCode= "!!!"]{
+	background-color:black;
+	color:OrangeRed;
+}
+td[ColorCode= "%%%"]{
+	background-color:black;
+	color:Cyan;
+}
+td[ColorCode= "$$$"]{
+	background-color:black;
+	color:LightSkyBlue;
+}
+
+/* Separator between diferent info area*/
+.separator{
+	border-bottom: 2px solid gray;
+}
+
+/* Developper: Used as help for cells alignement*/
+td{
+	/*border: black 1px solid;*/
+	border-radius: 7px;
+}

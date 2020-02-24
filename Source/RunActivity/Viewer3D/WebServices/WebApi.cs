@@ -31,6 +31,7 @@ using Orts.Simulation.Physics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using static Orts.Viewer3D.Popups.TrainDrivingWindow;
 
 namespace Orts.Viewer3D.WebServices
 {
@@ -48,6 +49,7 @@ namespace Orts.Viewer3D.WebServices
             ApiDict.Add("/API/HUD/", ApiHud);
             ApiDict.Add("/API/TEMPLATE/", ApiTemplate);
             ApiDict.Add("/API/TRACKMONITOR/", ApiTrackMonitor);
+            ApiDict.Add("/API/TRAINDRIVING/", ApiTrainDriving);
         }
 
         #region /API/Template/
@@ -207,6 +209,21 @@ namespace Orts.Viewer3D.WebServices
             , cabOrientation = trainInfo.cabOrientation
             , isOnPath = trainInfo.isOnPath
             };
+        }
+        #endregion
+
+        #region /API/TrainDriving/
+        // Provides most of the data in the Train Driving Ctrl+F5
+        public class TrainDrivingInfo
+        {
+            public List<ListLabel> trainDrivingData = new List<ListLabel>();
+        }
+
+        public object ApiTrainDriving(string Parameters)
+        {
+            List<ListLabel> trainDrivingInfo = Viewer.TrainDrivingWindow.TrainDrivingWebApiData();
+            return new TrainDrivingInfo
+            { trainDrivingData = trainDrivingInfo };
         }
         #endregion
     }

@@ -23,4 +23,31 @@ li a:hover:not(.active) {
 	background-color: #111;
 }
 
+/* Allows to apply text color */
+td[ColorCode="???"]{
+	background-color:gray;
+	color:yellow;
+}
+td[ColorCode= "!!!"]{
+	background-color:gray;
+	color:OrangeRed;
+}
+td[ColorCode= "%%%"]{
+	background-color:gray;
+	color:Cyan;
+}
+td[ColorCode= "$$$"]{
+	background-color: gray;
+	color:Pink;
+}
 
+.td_nowrap{
+	width: 1px;
+	white-space: nowrap;
+	padding-right: 10px;
+}
+
+/* Developper: Used as help for cells alignement*/
+/*td{
+	border: black 1px solid;
+}*/

@@ -28,8 +28,6 @@ using Orts.Simulation.RollingStocks;
 using System.Text;
 using ORTS.Common.Input;
 using Microsoft.Xna.Framework;
-using System.Threading;
-using System.Globalization;
 using System.IO;
 
 namespace Orts.Viewer3D.Popups
@@ -48,6 +46,7 @@ namespace Orts.Viewer3D.Popups
         int LinesCount = 0;
 
         public bool StandardHUD = true;// Standard text
+        public bool TrainDrivingUpdating = false;
 
         int WindowHeightMin = 0;
         int WindowHeightMax = 0;
@@ -78,8 +77,8 @@ namespace Orts.Viewer3D.Popups
             public bool ChangeColWidth { get; set; }
             public string keyPressed { get; set; }
         }
-        List<ListLabel> ListToLabel = new List<ListLabel>();
-
+        public List<ListLabel> ListToLabel = new List<ListLabel>();
+        public List<ListLabel> TempListToLabel = new List<ListLabel>();// used when listtolabel is changing
         // Change text color
         readonly Dictionary<string, Color> ColorCode = new Dictionary<string, Color>
         {
@@ -91,7 +90,7 @@ namespace Orts.Viewer3D.Popups
             { "??!", Color.Green },
             { "?!!", Color.PaleGreen },
             { "$$$", Color.LightSkyBlue},
-            { "$??", Color.Cyan}
+            { "%%%", Color.Cyan}
         };
 
         readonly Dictionary<string, string> FirstColToAbbreviated = new Dictionary<string, string>()
@@ -193,7 +192,7 @@ namespace Orts.Viewer3D.Popups
             {
                 var colWidth = ListToLabel.Max(x => x.FirstColWidth) + (StandardHUD ? FontToBold ? 19 : 16 : 8);
                 var TimeHboxPositionY = 0;
-                foreach (var data in ListToLabel)
+                foreach (var data in ListToLabel.ToList())
                 {
                     if (data.FirstCol.Contains(Viewer.Catalog.GetString("NwLn")))
                     {
@@ -435,18 +434,21 @@ namespace Orts.Viewer3D.Popups
             }
             else
             {
-                // Detect Autopilot is on to avoid flickering when slim window is displayed
-                var AutopilotOn = Owner.Viewer.Settings.Autopilot && Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING ? true : false;
-
-                //ResizeWindow, when the string spans over the right boundary of the window
-                var maxFirstColWidth = ListToLabel.Max(x => x.FirstColWidth);
-                var maxLastColWidth = ListToLabel.Max(x => x.LastColWidth);
-
-                if (!ResizeWindow & (FirstColOverFlow != maxFirstColWidth || (!AutopilotOn && LastColOverFlow != maxLastColWidth)))
+                if (this.Visible)// Avoids conflict with WebApi data updating
                 {
-                    LastColOverFlow = maxLastColWidth;
-                    FirstColOverFlow = maxFirstColWidth;
-                    ResizeWindow = true;
+                    // Detect Autopilot is on to avoid flickering when slim window is displayed
+                    var AutopilotOn = Owner.Viewer.Settings.Autopilot && Owner.Viewer.PlayerLocomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING ? true : false;
+
+                    //ResizeWindow, when the string spans over the right boundary of the window
+                    var maxFirstColWidth = ListToLabel.Max(x => x.FirstColWidth);
+                    var maxLastColWidth = ListToLabel.Max(x => x.LastColWidth);
+
+                    if (!ResizeWindow & (FirstColOverFlow != maxFirstColWidth || (!AutopilotOn && LastColOverFlow != maxLastColWidth)))
+                    {
+                        LastColOverFlow = maxLastColWidth;
+                        FirstColOverFlow = maxFirstColWidth;
+                        ResizeWindow = true;
+                    }
                 }
             }
         }
@@ -457,7 +459,7 @@ namespace Orts.Viewer3D.Popups
             var smallArrowUp = '\u25B3';  // △
             var arrowDown = '\u25BC';// ▼
             var smallArrowDown = '\u25BD';// ▽
-            var end = '\u2589';// block ▉
+            var end = '\u25AC';// Black rectangle ▬
             var endLower = '\u2596';// block ▖
             var arrowToRight = '\u25BA'; // ►
             var smallDiamond = '\u25C6'; // ●
@@ -631,7 +633,7 @@ namespace Orts.Viewer3D.Popups
             if (BrakeStatus.Contains(Viewer.Catalog.GetString("EQ")))
             {
                 brakeInfoValue = BrakeStatus.Substring(0, BrakeStatus.IndexOf(Viewer.Catalog.GetString("EQ"))).TrimEnd();
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "$??", "", false, keyPressed);
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
                 keyPressed = "";
                 index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("EQ"));
                 brakeInfoValue = BrakeStatus.Substring(index, BrakeStatus.IndexOf(Viewer.Catalog.GetString("BC")) - index).TrimEnd();
@@ -665,7 +667,7 @@ namespace Orts.Viewer3D.Popups
             {
                 var IndexOffset  = Viewer.Catalog.GetString("Lead").Length + 1;
                 brakeInfoValue = BrakeStatus.Substring(0, BrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead"))).TrimEnd();
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "$??", "", false, keyPressed);
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
 
                 keyPressed = "";
                 index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("Lead")) + IndexOffset;
@@ -688,7 +690,7 @@ namespace Orts.Viewer3D.Popups
             else if (BrakeStatus.Contains(Viewer.Catalog.GetString("BC")))
             {
                 brakeInfoValue = BrakeStatus.Substring(0, BrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"))).TrimEnd();
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "$??", "", false, keyPressed);
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Train brake"), brakeInfoValue + "%%%", "", false, keyPressed);
 
                 keyPressed = "";
                 index = BrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
@@ -710,14 +712,14 @@ namespace Orts.Viewer3D.Popups
             keyPressed = UserInput.IsDown(UserCommand.ControlEngineBrakeDecrease) ? arrowDown.ToString() + "???" : UserInput.IsDown(UserCommand.ControlEngineBrakeIncrease) ? arrowUp.ToString() + "???" : "";
             if (EngineBrakeStatus.Contains(Viewer.Catalog.GetString("BC")))
             {
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), EngineBrakeStatus.Substring(0, EngineBrakeStatus.IndexOf("BC")) + "$??", "", false, keyPressed);
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), EngineBrakeStatus.Substring(0, EngineBrakeStatus.IndexOf("BC")) + "%%%", "", false, keyPressed);
                 keyPressed = "";
                 index = EngineBrakeStatus.IndexOf(Viewer.Catalog.GetString("BC"));
                 brakeInfoValue = EngineBrakeStatus.Substring(index, EngineBrakeStatus.Length - index).TrimEnd();
                 InfoToLabel(keyPressed, Viewer.Catalog.GetString(""), brakeInfoValue + "!??", "", false, keyPressed);
             }
             else
-                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), EngineBrakeStatus + "$??", "", false, keyPressed);
+                InfoToLabel(keyPressed, Viewer.Catalog.GetString("Engine brake"), EngineBrakeStatus + "%%%", "", false, keyPressed);
 
             keyPressed = "";
             if (DynamicBrakeStatus != null && Locomotive.IsLeadLocomotive())
@@ -728,17 +730,17 @@ namespace Orts.Viewer3D.Popups
                     StartTime = Locomotive.DynamicBrakeCommandStartTime + Locomotive.DynamicBrakeDelayS;
                     DynBrakeSetup = true;
                     keyPressed = arrowToRight.ToString() + "???";
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Setup") + "$??", "", false, keyPressed);
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Setup") + "%%%", "", false, keyPressed);
                 }
                 else if (DynBrakeSetup && StartTime < Owner.Viewer.Simulator.ClockTime)
                 {
                     DynBrakeSetup = false;
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), DynamicBrakePercent + "% " + "$??", "", false, keyPressed);
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), DynamicBrakePercent + "% " + "%%%", "", false, keyPressed);
                 }
                 else if (DynBrakeSetup && StartTime > Owner.Viewer.Simulator.ClockTime)
                 {
                     keyPressed = arrowToRight.ToString() + "???";
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Setup") + "$??", "", false, keyPressed);
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), Viewer.Catalog.GetString("Setup") + "%%%", "", false, keyPressed);
                 }
                 else if (!DynBrakeSetup && DynamicBrakePercent > -1)
                 {
@@ -754,7 +756,7 @@ namespace Orts.Viewer3D.Popups
                             : UserInput.IsDown(UserCommand.ControlDynamicBrakeIncrease) ? arrowUp.ToString() + "???"
                             : "";
                     }
-                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), DynamicBrakeStatus + "$??", "", false, keyPressed);
+                    InfoToLabel(keyPressed, Viewer.Catalog.GetString("Dynamic brake"), DynamicBrakeStatus + "%%%", "", false, keyPressed);
                 }
                 else if (DynamicBrakeStatus == "" && DynamicBrakePercent < 0)
                 {
@@ -784,7 +786,7 @@ namespace Orts.Viewer3D.Popups
                             var bandLower = steamloco.PreviousBoilerHeatOutBTUpS * 0.975f; // find lower bandwidth point - gives a total 5% bandwidth
 
                             if (steamloco.BoilerHeatInBTUpS > bandLower && steamloco.BoilerHeatInBTUpS < bandUpper) HeatColor = smallDiamond.ToString() + "!??";
-                            else if (steamloco.BoilerHeatInBTUpS < bandLower) HeatColor = smallArrowDown.ToString() + "$??"; // Color.Cyan
+                            else if (steamloco.BoilerHeatInBTUpS < bandLower) HeatColor = smallArrowDown.ToString() + "%%%"; // Color.Cyan
                             else if (steamloco.BoilerHeatInBTUpS > bandUpper) HeatColor = smallArrowUp.ToString() + "!!?"; // Color.Orange
 
                             keyPressed = "";
@@ -891,7 +893,7 @@ namespace Orts.Viewer3D.Popups
                 InfoToLabel(" ", Viewer.Catalog.GetString("Doors open"), status, "", false, keyPressed);
             }
             else
-                InfoToLabel(" ", Viewer.Catalog.GetString("Doors open") + "?!?", Viewer.Catalog.GetString("Closed"), "", false, keyPressed);
+                InfoToLabel(" ", Viewer.Catalog.GetString("Doors open") + "?!?", Viewer.Catalog.GetString("Closed") + "?!?", "", false, keyPressed);
 
             // Ctrl + F Firing to manual
             if (UserInput.IsDown(UserCommand.ControlFiring))
@@ -914,11 +916,13 @@ namespace Orts.Viewer3D.Popups
                    true : false;
 
             // Avoid to updateFull when the window is moving
-            if (!MovingCurrentWindow & updateFull)
+            if (!MovingCurrentWindow && !TrainDrivingUpdating && updateFull)
             {
+                TrainDrivingUpdating = true;
                 UpdateData();
+                TrainDrivingUpdating = false;
 
-                // Ctrl + F (FiringIsManual)
+               // Ctrl + F (FiringIsManual)
                if (ResizeWindow || LinesCount != ListToLabel.Count())
                {
                     ResizeWindow = false;
@@ -929,6 +933,30 @@ namespace Orts.Viewer3D.Popups
                //Update Layout
                Layout();
             }
+        }
+
+        // ==========================================================================================================================================
+        //      Method to construct the train driving info data for use by the WebServer
+        //      Replaces the Prepare Frame Method
+        //      updated from  djr - 20171221
+        // ==========================================================================================================================================
+        public List<ListLabel> TrainDrivingWebApiData()
+        {
+            if (!TrainDrivingUpdating)
+            {               
+                TrainDrivingUpdating = true;
+                UpdateData();
+                TrainDrivingUpdating = false;
+
+                // Ctrl + F (FiringIsManual)
+                if (ResizeWindow || LinesCount != ListToLabel.Count())
+                {
+                    ResizeWindow = false;
+                    UpdateWindowSize();
+                    LinesCount = ListToLabel.Count();
+                }
+            }
+            return (ListToLabel.ToList());// try to avoid crash in the JsonConvert.SerializeObject
         }
     }
 }

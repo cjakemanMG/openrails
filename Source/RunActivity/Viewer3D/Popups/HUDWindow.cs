@@ -31,10 +31,12 @@ using ORTS.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace Orts.Viewer3D.Popups
 {
@@ -64,19 +66,24 @@ namespace Orts.Viewer3D.Popups
         public int PathHeaderColumn = 0;
         public static int columnsChars = 0;
         public int[] lineOffsetLocoInfo = { 0, 0, 0, 0, 0, 0 };
-        public static int hudWindowLinesActualPage = 1;
-        public static int hudWindowLinesPagesCount = 1;
-        public static int hudWindowColumnsActualPage = 0;
-        public static int hudWindowColumnsPagesCount = 0;
-        public static int hudWindowLocoActualPage = 0;
-        public static int hudWindowLocoPagesCount = 1;
-        public static bool hudWindowFullScreen = false;
-        public static bool hudWindowHorizontalScroll = false;
-        public static bool hudWindowSteamLocoLead = false;
+        public int hudWindowLinesActualPage = 1;
+        public int hudWindowLinesPagesCount = 1;
+        public int hudWindowColumnsActualPage = 0;
+        public int hudWindowColumnsPagesCount = 0;
+        public int hudWindowLocoActualPage = 0;
+        public int hudWindowLocoPagesCount = 1;
+        public bool hudWindowFullScreen = false;
+        public bool hudWindowHorizontalScroll = false;
+        public bool hudWindowSteamLocoLead = false;
         List<string> stringStatus = new List<string>();
-        public static bool BrakeInfoVisible = false;
+        public bool BrakeInfoVisible = false;
+
+        // Save current language. Valid until locates was right.
+        public static CultureInfo LocaleCurrentCulture = Thread.CurrentThread.CurrentUICulture;
+        public static CultureInfo HUDWebServerCurrentCulture = new System.Globalization.CultureInfo("en");
 
         public int WebServerPageNo = 0;
+        public bool WebServerEnabled = false;
         int TextPage;
         int LocomotivePage = 2;
         int LastTextPage;
@@ -144,6 +151,9 @@ namespace Orts.Viewer3D.Popups
             TextFont = owner.TextFontMonoSpacedOutlined;
 
             ColumnWidth *= TextFont.Height;
+
+            // Avoids conflict with HudScrollNav window
+            WebServerEnabled = owner.Viewer.Settings.WebServer;
 
             HUDGraphMaterial = (HUDGraphMaterial)Viewer.MaterialManager.Load("Debug");
 
@@ -300,8 +310,12 @@ namespace Orts.Viewer3D.Popups
         // ==========================================================================================================================================
         public TableData PrepareTable(int PageNo)
         {
+            if (WebServerEnabled && (HUDWebServerCurrentCulture.Name != Viewer.Catalog.GetString("en") || Thread.CurrentThread.CurrentUICulture.Name != Viewer.Catalog.GetString("en")))
+                Thread.CurrentThread.CurrentUICulture = HUDWebServerCurrentCulture = new System.Globalization.CultureInfo("en");
+
             var table = new TableData() { Cells = new string[1, 1] };
             WebServerPageNo = PageNo;
+
             TextPages[PageNo](table);
             return (table);
         }
@@ -439,7 +453,7 @@ namespace Orts.Viewer3D.Popups
             
             //Disable Hudscroll.
             if(Viewer.HUDScrollWindow.Visible)
-                Viewer.HUDScrollWindow.Visible = TextPage == 0 && WebServerPageNo == 0 ? false : true;
+                Viewer.HUDScrollWindow.Visible = TextPage == 0 && !WebServerEnabled ? false : true;
 
             TableSetLabelValueColumns(table, 0, 2);
             TableAddLabelValue(table, Viewer.Catalog.GetString("Version"), VersionInfo.VersionOrBuild);
@@ -835,7 +849,7 @@ namespace Orts.Viewer3D.Popups
                     }
                 }
 
-                if (hudWindowLocoActualPage > 0 && !statusData[i > nLinesShow ? i - lineOffsetLocoInfo[hudWindowLinesActualPage] : i].StartsWith(LocomotiveName[0]))
+                if (hudWindowLocoActualPage > 0 && !statusData[i >= nLinesShow ? i - lineOffsetLocoInfo[hudWindowLinesActualPage] : i].StartsWith(LocomotiveName[0]))
                 {
                     if (hudWindowColumnsActualPage > 0)
                     {
@@ -1189,7 +1203,7 @@ namespace Orts.Viewer3D.Popups
             var mstsLocomotive = Viewer.PlayerLocomotive as MSTSLocomotive;
 
             ResetHudScroll(); //Reset Hudscroll.
-            if (hudWindowFullScreen)
+            if (hudWindowFullScreen || WebServerEnabled)
                 TableSetLabelValueColumns(table, 0, 2);
 
             if (mstsLocomotive != null)
@@ -1634,7 +1648,7 @@ namespace Orts.Viewer3D.Popups
             //Disable Hudscroll.
             Viewer.HUDScrollWindow.Visible = WebServerPageNo > 0? true: false;//HudScroll
 
-            if (hudWindowFullScreen)
+            if (hudWindowFullScreen || WebServerEnabled)
                 TableSetLabelValueColumns(table, 0, 2);
 
             TableAddLabelValue(table, Viewer.Catalog.GetString("Visibility"), Viewer.Catalog.GetStringFmt("{0:N0} m", Viewer.Simulator.Weather.FogDistance));
@@ -1652,7 +1666,7 @@ namespace Orts.Viewer3D.Popups
             //Disable Hudscroll.
             Viewer.HUDScrollWindow.Visible = WebServerPageNo > 0 ? true : false;//HudScroll
 
-            if (hudWindowFullScreen)
+            if (hudWindowFullScreen || WebServerEnabled)
                 TableSetLabelValueColumns(table, 0, 2);
 
             var allocatedBytesPerSecond = AllocatedBytesPerSecCounter == null ? 0 : AllocatedBytesPerSecCounter.NextValue();
@@ -1913,15 +1927,17 @@ namespace Orts.Viewer3D.Popups
                 }
 
                 //Add '\n' to all stringStatus when 'PlayerLoco' Header
-                if (stringStatus.Count > 0 && stringStatus[0].Contains(Viewer.Catalog.GetString("PlayerLoco")) && stringStatus[stringStatus.Count - 1].EndsWith("\n"))
-                {//TO DO: rewrite this code using LINQ
-                    for (int n = 0; n < stringStatus.Count - 1; n++)
-                    {
-                        if (!stringStatus[n].EndsWith("\n"))
-                            stringStatus[n] = stringStatus[n] + "\n";
+                if (stringStatus.Count > 0 && stringStatus[0].Contains(Viewer.Catalog.GetString("PlayerLoco")))
+                {
+                    if (stringStatus[stringStatus.Count - 1].EndsWith("\n"))
+                    {//TO DO: rewrite this code using LINQ
+                        for (int n = 0; n < stringStatus.Count - 1; n++)
+                        {
+                            if (!stringStatus[n].EndsWith("\n"))
+                                stringStatus[n] = stringStatus[n] + "\n";
+                        }
                     }
                 }
-
                 //Update 'page right' and 'page left' labels.
                 if (stringStatus.Count > 1 && stringStatus.Count > hudWindowColumnsPagesCount)
                     hudWindowColumnsPagesCount = stringStatus.Count;
@@ -2008,7 +2024,7 @@ namespace Orts.Viewer3D.Popups
                 hudWindowColumnsActualPage = 0;
                 hudWindowColumnsPagesCount = 0;
                 //Allow to show loco info by default
-                hudWindowLocoActualPage = TextPages[TextPage] == TextPageLocomotiveInfo ? 1 : 0;
+                hudWindowLocoActualPage = TextPages[TextPage] == TextPageLocomotiveInfo || (WebServerEnabled && TextPages[WebServerPageNo] == TextPageLocomotiveInfo) ? 1 : 0;
                 hudWindowLocoPagesCount = 1;
                 hudWindowSteamLocoLead = false;
                 lResetHudScroll = true;
@@ -2027,7 +2043,7 @@ namespace Orts.Viewer3D.Popups
         {
             for (int i = 0; i < statusConsist.Count; i++)
             {
-                if (i > 0 && i < 2 && (statusConsist[i] == stringStatus[i - 1]) || i > 1 && (statusConsist[i - 2] == statusConsist[i]))
+                if (i > 0 && stringStatus.Count> 0  && i < 2 && (statusConsist[i] == stringStatus[i - 1]) || i > 1 && (statusConsist[i - 2] == statusConsist[i]))
                     continue;
 
                 TextColNumber(statusConsist[i], 0, IsSteamLocomotive);

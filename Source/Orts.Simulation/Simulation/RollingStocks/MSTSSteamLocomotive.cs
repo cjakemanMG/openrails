@@ -5711,7 +5711,7 @@ namespace Orts.Simulation.RollingStocks
         {
             var status = new StringBuilder(base.GetDebugStatus());
 
-            status.AppendFormat("\n\n\t\t === {0} === \t\t\n", Simulator.Catalog.GetString("Key Inputs"));
+            status.AppendFormat("\n\t\t === {0} === \t\t\n", Simulator.Catalog.GetString("Key Inputs"));
 
             status.AppendFormat("{0}\t\t{1}\n", Simulator.Catalog.GetString("Locomotive Type:"),
                 SteamLocoType);
@@ -6322,12 +6322,12 @@ namespace Orts.Simulation.RollingStocks
             if ((BrakeSystem is VacuumSinglePipe))
             {
 
-                status.AppendFormat("\n\t\t\t === {0} === \t\t{1}/{2}\n",
+                status.AppendFormat("\n\t\t === {0} === \t\t{1}/{2}\n",
                 Simulator.Catalog.GetString("Ejector / Vacuum Pump"),
                 FormatStrings.FormatMass(pS.TopH(Kg.FromLb(EjectorTotalSteamConsumptionLbpS)), IsMetric),
                 FormatStrings.h);
 
-                status.AppendFormat("\t{0}\t{1}\t{2:N2}\t{3}\t{4:N2}/{5}\t{6}\t{7:N2}\t{8}\t{9}",
+                status.AppendFormat("{0}\t{1}\t{2:N2}\t{3}\t{4:N2}/{5}\t{6}\t{7:N2}\t{8}\t{9}",
                 Simulator.Catalog.GetString("Large:"),
                 Simulator.Catalog.GetString("Press"),
                 FormatStrings.FormatPressure(SteamEjectorLargePressurePSI, PressureUnit.PSI, MainPressureUnit, true),

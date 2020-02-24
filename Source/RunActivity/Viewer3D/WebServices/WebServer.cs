@@ -342,8 +342,8 @@ namespace Orts.Viewer3D.WebServices
             // Trim off the final "CALL_API"
             var apiName = uri.Substring(0, uri.Length - "CALL_API".Length);
 
-            Func<string, object> apiMethod;
-            if (!WebApi.ApiDict.TryGetValue(apiName, out apiMethod))
+            //Func<string, object> apiMethod;
+            if (!WebApi.ApiDict.TryGetValue(apiName, out Func<string, object> apiMethod))
             {
                 SendApiNotFound(response, uri);
                 return;
@@ -419,7 +419,7 @@ namespace Orts.Viewer3D.WebServices
 
         private static void HTMLContent(HttpResponse response, string embed)
         {
-            response.strContent = "<!doctype HTML>" +
+            response.strContent = "<!DOCTYPE HTML>" +
                                   "<html>" +
                                   "<head>" +
                                   "<meta http-equiv=\"Content-Type\" content=\"text/html;" +
