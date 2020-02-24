@@ -132,6 +132,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool CircuitBreakerOpeningOrder { get; private set; }
         public bool TractionAuthorization { get; private set; }
 
+        public float[] CabDisplayControls = new float[32];
+
+        // generic TCS commands
+        public bool[] TCSCommandButtonDown = new bool[16];
+        // List of customized control strings;
+        public List<string> CustomizedTCSControlStrings = new List<string>();
+
         string ScriptName;
         string SoundFileName;
         string ParametersFileName;
@@ -272,6 +279,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.LocomotiveBrakeCylinderPressureBar = () => Locomotive.BrakeSystem != null ? Bar.FromPSI(Locomotive.BrakeSystem.GetCylPressurePSI()) : float.MaxValue;
             Script.DoesBrakeCutPower = () => Locomotive.DoesBrakeCutPower;
             Script.BrakeCutsPowerAtBrakeCylinderPressureBar = () => Bar.FromPSI(Locomotive.BrakeCutsPowerAtBrakeCylinderPressurePSI);
+            Script.LineSpeedMpS = () => (float)Simulator.TRK.Tr_RouteFile.SpeedLimit;
+            Script.DoesStartFromTerminalStation = () => DoesStartFromTerminalStation();
+            Script.IsColdStart = () => Locomotive.Train.ColdStart;
+            Script.GetTrackNodeOffset = () => Locomotive.Train.FrontTDBTraveller.TrackNodeLength - Locomotive.Train.FrontTDBTraveller.TrackNodeOffset;
+            Script.NextDivergingSwitchDistanceM = (value) => NextDivergingSwitchItem<float>(value, ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.FACING_SWITCH);
 
             // TrainControlSystem functions
             Script.SpeedCurve = (arg1, arg2, arg3, arg4, arg5) => SpeedCurve(arg1, arg2, arg3, arg4, arg5);
@@ -336,6 +348,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.SetNextSpeedLimitMpS = (value) => this.NextSpeedLimitMpS = value;
             Script.SetInterventionSpeedLimitMpS = (value) => this.InterventionSpeedLimitMpS = value;
             Script.SetNextSignalAspect = (value) => this.CabSignalAspect = (TrackMonitorSignalAspect)value;
+            Script.SetCabDisplayControl = (arg1, arg2) => CabDisplayControls[arg1] = arg2;
+            Script.SetCustomizedTCSControlString = (value) => CustomizedTCSControlStrings.Add(value);
 
             // TrainControlSystem INI configuration file
             Script.GetBoolParameter = (arg1, arg2, arg3) => LoadParameter<bool>(arg1, arg2, arg3);
@@ -479,6 +493,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             return retval;
         }
 
+        private bool DoesStartFromTerminalStation()
+        {
+            var tempTraveller = new Traveller(Locomotive.Train.RearTDBTraveller);
+            tempTraveller.ReverseDirection();
+            return tempTraveller.NextTrackNode() && tempTraveller.IsEnd;
+        }
+
 
         private void SignalEvent(Event evt, TrainControlSystem script)
         {
@@ -491,7 +512,26 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             {
                 Trace.TraceInformation("Sound event skipped due to thread safety problem " + error.Message);
             }
-}
+        }
+
+        T NextDivergingSwitchItem<T>(float maxDistanceM, ref T retval, Train.TrainObjectItem.TRAINOBJECTTYPE type)
+        {
+            var LocalTrainInfo = Locomotive.Train.GetTrainInfo();
+            SignalDistance = float.MaxValue;
+            foreach (var foundItem in Locomotive.Train.MUDirection == Direction.Reverse ? TrainInfo.ObjectInfoBackward : TrainInfo.ObjectInfoForward)
+            {
+                if (foundItem.DistanceToTrainM > maxDistanceM)
+                {
+                    return retval;
+                }
+                else if (foundItem.ItemType == type)
+                {
+                    SignalDistance = foundItem.DistanceToTrainM;
+                    return retval;
+                }
+            }
+            return retval;
+        }
 
         private static float SpeedCurve(float targetDistanceM, float targetSpeedMpS, float slope, float delayS, float decelerationMpS2)
         {
@@ -584,6 +624,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             HandleEvent(TCSEvent.AlerterReset);
         }
 
+        public void TCSCommandPressed(bool pressed, int commandIndex)
+        {
+            TCSCommandButtonDown[commandIndex] = pressed;
+            HandleEvent(pressed ? TCSEvent.GenericTCSButtonPressed : TCSEvent.GenericTCSButtonReleased, commandIndex);
+        }
+
         public void SetEmergency(bool emergency)
         {
             if (Script != null)
@@ -603,6 +649,15 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Script.HandleEvent(evt, message);
         }
 
+        public void HandleEvent(TCSEvent evt, int eventIndex)
+        {
+            if (Script != null)
+            {
+                var message = eventIndex.ToString();
+                Script.HandleEvent(evt, message);
+            }
+        }
+
         private T LoadParameter<T>(string sectionName, string keyName, T defaultValue)
         {
             var buffer = new String('\0', 256);
@@ -616,6 +671,17 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             else
                 return defaultValue;
         }
+
+        public string GetDisplayString(string originalString)
+        {
+            if (originalString.Length < 9) return originalString;
+            if (originalString.Substring(0, 8) != "ORTS_TCS") return originalString;
+            var commandIndex = Convert.ToInt32(originalString.Substring(8));
+            if (CustomizedTCSControlStrings.Count >= commandIndex && CustomizedTCSControlStrings[commandIndex - 1] != "")
+                return CustomizedTCSControlStrings[commandIndex - 1];
+            return originalString;
+        }
+
     }
 
     public class MSTSTrainControlSystem : TrainControlSystem

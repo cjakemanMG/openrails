@@ -152,6 +152,28 @@ namespace ORTS.Scripting.Api
         /// Train brake pressure value which triggers the power cut-off.
         /// </summary>
         public Func<float> BrakeCutsPowerAtBrakeCylinderPressureBar;
+        /// <summary>
+        /// Line speed taken from .trk file.
+        /// </summary>
+        public Func<float> LineSpeedMpS;
+        /// <summary>
+        /// True if starting from terminal station (no track behind the train).
+        /// </summary>
+        public Func<bool> DoesStartFromTerminalStation;
+        /// <summary>
+        /// True if game just started and train speed = 0.
+        /// </summary>
+        public Func<bool> IsColdStart;
+        /// <summary>
+        /// Get front traveller track node offset.
+        /// </summary>
+        public Func<float> GetTrackNodeOffset;
+        /// <summary>
+        /// Search next diverging switch distance
+        /// </summary>
+        public Func<float, float> NextDivergingSwitchDistanceM;
+
+
 
         // TODO: The following will be available in .NET 4 as normal Func:
         public delegate TResult Func5<T1, T2, T3, T4, T5, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
@@ -295,6 +317,14 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Action<Aspect> SetNextSignalAspect;
         /// <summary>
+        /// Will be whown on ASPECT_DISPLAY cabcontrol.
+        /// </summary>
+        public Action<int, float> SetCabDisplayControl;
+        /// <summary>
+        /// Will be whown on ASPECT_DISPLAY cabcontrol.
+        /// </summary>
+        public Action<string> SetCustomizedTCSControlString;
+        /// <summary>
         /// Get bool parameter in the INI file.
         /// </summary>
         public Func<string, string, bool, bool> GetBoolParameter;
@@ -391,6 +421,14 @@ namespace ORTS.Scripting.Api
         /// Internal reset request by the horn handle.
         /// </summary>
         HornActivated,
+        /// <summary>
+        /// Generic TCS button pressed.
+        /// </summary>
+        GenericTCSButtonPressed,
+        /// <summary>
+        /// Generic TCS button released.
+        /// </summary>
+        GenericTCSButtonReleased,
     }
 
     /// <summary>

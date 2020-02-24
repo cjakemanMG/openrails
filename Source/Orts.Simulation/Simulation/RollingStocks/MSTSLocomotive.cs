@@ -4386,6 +4386,42 @@ namespace Orts.Simulation.RollingStocks
                     data = seconds;
                     break;
 
+                // Train Control System controls
+                case CABViewControlTypes.ORTS_TCS1:
+                case CABViewControlTypes.ORTS_TCS2:
+                case CABViewControlTypes.ORTS_TCS3:
+                case CABViewControlTypes.ORTS_TCS4:
+                case CABViewControlTypes.ORTS_TCS5:
+                case CABViewControlTypes.ORTS_TCS6:
+                case CABViewControlTypes.ORTS_TCS7:
+                case CABViewControlTypes.ORTS_TCS8:
+                case CABViewControlTypes.ORTS_TCS9:
+                case CABViewControlTypes.ORTS_TCS10:
+                case CABViewControlTypes.ORTS_TCS11:
+                case CABViewControlTypes.ORTS_TCS12:
+                case CABViewControlTypes.ORTS_TCS13:
+                case CABViewControlTypes.ORTS_TCS14:
+                case CABViewControlTypes.ORTS_TCS15:
+                case CABViewControlTypes.ORTS_TCS16:
+                case CABViewControlTypes.ORTS_TCS17:
+                case CABViewControlTypes.ORTS_TCS18:
+                case CABViewControlTypes.ORTS_TCS19:
+                case CABViewControlTypes.ORTS_TCS20:
+                case CABViewControlTypes.ORTS_TCS21:
+                case CABViewControlTypes.ORTS_TCS22:
+                case CABViewControlTypes.ORTS_TCS23:
+                case CABViewControlTypes.ORTS_TCS24:
+                case CABViewControlTypes.ORTS_TCS25:
+                case CABViewControlTypes.ORTS_TCS26:
+                case CABViewControlTypes.ORTS_TCS27:
+                case CABViewControlTypes.ORTS_TCS28:
+                case CABViewControlTypes.ORTS_TCS29:
+                case CABViewControlTypes.ORTS_TCS30:
+                case CABViewControlTypes.ORTS_TCS31:
+                case CABViewControlTypes.ORTS_TCS32:
+                    data = TrainControlSystem.CabDisplayControls[(int)cvc.ControlType - (int)CABViewControlTypes.ORTS_TCS1];
+                    break;
+
                 default:
                     {
                         data = 0;
