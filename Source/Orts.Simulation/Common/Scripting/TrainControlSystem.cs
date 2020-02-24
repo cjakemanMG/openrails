@@ -168,6 +168,11 @@ namespace ORTS.Scripting.Api
         /// Get front traveller track node offset.
         /// </summary>
         public Func<float> GetTrackNodeOffset;
+        /// <summary>
+        /// Search next diverging switch distance
+        /// </summary>
+        public Func<float, float> NextDivergingSwitchDistanceM;
+
 
 
         // TODO: The following will be available in .NET 4 as normal Func:

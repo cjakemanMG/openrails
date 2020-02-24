@@ -283,6 +283,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.DoesStartFromTerminalStation = () => DoesStartFromTerminalStation();
             Script.IsColdStart = () => Locomotive.Train.ColdStart;
             Script.GetTrackNodeOffset = () => Locomotive.Train.FrontTDBTraveller.TrackNodeLength - Locomotive.Train.FrontTDBTraveller.TrackNodeOffset;
+            Script.NextDivergingSwitchDistanceM = (value) => NextDivergingSwitchItem<float>(value, ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.FACING_SWITCH);
 
             // TrainControlSystem functions
             Script.SpeedCurve = (arg1, arg2, arg3, arg4, arg5) => SpeedCurve(arg1, arg2, arg3, arg4, arg5);
@@ -511,7 +512,26 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             {
                 Trace.TraceInformation("Sound event skipped due to thread safety problem " + error.Message);
             }
-}
+        }
+
+        T NextDivergingSwitchItem<T>(float maxDistanceM, ref T retval, Train.TrainObjectItem.TRAINOBJECTTYPE type)
+        {
+            var LocalTrainInfo = Locomotive.Train.GetTrainInfo();
+            SignalDistance = float.MaxValue;
+            foreach (var foundItem in Locomotive.Train.MUDirection == Direction.Reverse ? TrainInfo.ObjectInfoBackward : TrainInfo.ObjectInfoForward)
+            {
+                if (foundItem.DistanceToTrainM > maxDistanceM)
+                {
+                    return retval;
+                }
+                else if (foundItem.ItemType == type)
+                {
+                    SignalDistance = foundItem.DistanceToTrainM;
+                    return retval;
+                }
+            }
+            return retval;
+        }
 
         private static float SpeedCurve(float targetDistanceM, float targetSpeedMpS, float slope, float delayS, float decelerationMpS2)
         {
