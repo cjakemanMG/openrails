@@ -131,6 +131,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public bool CircuitBreakerClosingOrder { get; private set;  }
         public bool CircuitBreakerOpeningOrder { get; private set; }
         public bool TractionAuthorization { get; private set; }
+        public bool FullDynamicBrakingOrder { get; private set; }
 
         public float[] CabDisplayControls = new float[32];
 
@@ -159,6 +160,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             CircuitBreakerClosingOrder = false;
             CircuitBreakerOpeningOrder = false;
             TractionAuthorization = true;
+            FullDynamicBrakingOrder = false;
         }
 
         public void Parse(string lowercasetoken, STFReader stf)
@@ -284,6 +286,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.IsColdStart = () => Locomotive.Train.ColdStart;
             Script.GetTrackNodeOffset = () => Locomotive.Train.FrontTDBTraveller.TrackNodeLength - Locomotive.Train.FrontTDBTraveller.TrackNodeOffset;
             Script.NextDivergingSwitchDistanceM = (value) => NextDivergingSwitchItem<float>(value, ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.FACING_SWITCH);
+            Script.GetControlMode = () => (TRAIN_CONTROL)(int)Locomotive.Train.ControlMode;
 
             // TrainControlSystem functions
             Script.SpeedCurve = (arg1, arg2, arg3, arg4, arg5) => SpeedCurve(arg1, arg2, arg3, arg4, arg5);
@@ -314,6 +317,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 if (Locomotive.TrainBrakeController.TCSEmergencyBraking != value)
                     Locomotive.TrainBrakeController.TCSEmergencyBraking = value;
             };
+            Script.SetFullDynamicBrake = (value) => FullDynamicBrakingOrder = value;
             Script.SetThrottleController = (value) => Locomotive.ThrottleController.SetValue(value);
             Script.SetDynamicBrakeController = (value) => Locomotive.DynamicBrakeController.SetValue(value);
             Script.SetPantographsDown = () =>
@@ -350,6 +354,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.SetNextSignalAspect = (value) => this.CabSignalAspect = (TrackMonitorSignalAspect)value;
             Script.SetCabDisplayControl = (arg1, arg2) => CabDisplayControls[arg1] = arg2;
             Script.SetCustomizedTCSControlString = (value) => CustomizedTCSControlStrings.Add(value);
+            Script.RequestToggleManualMode = () => Locomotive.Train.RequestToggleManualMode();
 
             // TrainControlSystem INI configuration file
             Script.GetBoolParameter = (arg1, arg2, arg3) => LoadParameter<bool>(arg1, arg2, arg3);

@@ -172,6 +172,10 @@ namespace ORTS.Scripting.Api
         /// Search next diverging switch distance
         /// </summary>
         public Func<float, float> NextDivergingSwitchDistanceM;
+        /// <summary>
+        /// Get Control Mode of player train
+        /// </summary>
+        public Func<TRAIN_CONTROL> GetControlMode;
 
 
 
@@ -202,6 +206,9 @@ namespace ORTS.Scripting.Api
         /// Set emergency braking on or off.
         /// </summary>
         public Action<bool> SetEmergencyBrake;
+        /// Set full dynamic braking on or off.
+        /// </summary>
+        public Action<bool> SetFullDynamicBrake;
         /// <summary>
         /// Set throttle controller to position in range [0-1].
         /// </summary>
@@ -317,13 +324,17 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Action<Aspect> SetNextSignalAspect;
         /// <summary>
-        /// Will be whown on ASPECT_DISPLAY cabcontrol.
+        /// Will be shown on ASPECT_DISPLAY cabcontrol.
         /// </summary>
         public Action<int, float> SetCabDisplayControl;
         /// <summary>
-        /// Will be whown on ASPECT_DISPLAY cabcontrol.
+        /// Will be shown on ASPECT_DISPLAY cabcontrol.
         /// </summary>
         public Action<string> SetCustomizedTCSControlString;
+        /// <summary>
+        /// Requests toggle to and from Manual Mode.
+        /// </summary>
+        public Action RequestToggleManualMode;
         /// <summary>
         /// Get bool parameter in the INI file.
         /// </summary>
@@ -378,6 +389,20 @@ namespace ORTS.Scripting.Api
         Stop,
         Permission,
     }
+
+    // Represents the same enum as TRAIN_CONTROL
+
+    public enum TRAIN_CONTROL
+        {
+            AUTO_SIGNAL,
+            AUTO_NODE,
+            MANUAL,
+            EXPLORER,
+            OUT_OF_CONTROL,
+            INACTIVE,
+            TURNTABLE,
+            UNDEFINED
+        }
 
     public enum TCSEvent
     {
