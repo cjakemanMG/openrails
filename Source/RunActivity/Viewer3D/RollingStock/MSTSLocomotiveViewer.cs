@@ -1790,18 +1790,22 @@ namespace Orts.Viewer3D.RollingStock
                     break;
                 case CABViewControlTypes.DYNAMIC_BRAKE:
                 case CABViewControlTypes.DYNAMIC_BRAKE_DISPLAY:
+                    var dynBrakePercent = Locomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING ?
+                        Locomotive.DynamicBrakePercent : Locomotive.LocalDynamicBrakePercent;
                     if (Locomotive.DynamicBrakeController != null)
                     {
-                        if (Locomotive.DynamicBrakePercent == -1)
+                        if (dynBrakePercent == -1)
                             break;
                         if (!Locomotive.HasSmoothStruc)
+                        {
                             index = Locomotive.DynamicBrakeController != null ? Locomotive.DynamicBrakeController.CurrentNotch : 0;
+                        }
                         else
-                            index = PercentToIndex(Locomotive.DynamicBrakePercent);
+                            index = PercentToIndex(dynBrakePercent);
                     }
                     else
                     {
-                        index = PercentToIndex(Locomotive.DynamicBrakePercent);
+                        index = PercentToIndex(dynBrakePercent);
                     }
                     break;
                 case CABViewControlTypes.CPH_DISPLAY:
