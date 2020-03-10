@@ -1741,12 +1741,19 @@ namespace Orts.Simulation.RollingStocks
                     {
                         DynamicBrakeController.Update(elapsedClockSeconds);
                         DynamicBrakePercent = (DynamicBrakeIntervention < 0 ? DynamicBrakeController.CurrentValue : DynamicBrakeIntervention) * 100f;
+                        LocalDynamicBrakePercent = (DynamicBrakeIntervention < 0 ? DynamicBrakeController.CurrentValue : DynamicBrakeIntervention) * 100f;
                     }
                     else
+                    {
                         DynamicBrakePercent = Math.Max(DynamicBrakeIntervention * 100f, 0f);
+                        LocalDynamicBrakePercent = Math.Max(DynamicBrakeIntervention * 100f, 0f);
+                    }
 
                     if (DynamicBrakeIntervention < 0 && PreviousDynamicBrakeIntervention >= 0 && DynamicBrakePercent == 0)
+                    {
                         DynamicBrakePercent = -1;
+                        LocalDynamicBrakePercent = -1;
+                    }
                     PreviousDynamicBrakeIntervention = DynamicBrakeIntervention;
                 }
                 else if (DynamicBrakeController != null)
@@ -3446,6 +3453,8 @@ namespace Orts.Simulation.RollingStocks
                 return null;
             if (DynamicBrakePercent < 0)
                 return string.Empty;
+            if (TrainControlSystem.FullDynamicBrakingOrder)
+                return string.Format("{0:F0}%", DynamicBrakePercent);
             return string.Format("{0}", DynamicBrakeController.GetStatus());
         }
         #endregion
