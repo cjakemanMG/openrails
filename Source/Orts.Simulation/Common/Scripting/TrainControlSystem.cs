@@ -29,6 +29,10 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<bool> IsTrainControlEnabled;
         /// <summary>
+        /// True if train is autopiloted
+        /// </summary>
+        public Func<bool> IsAutopiloted;
+        /// <summary>
         /// True if vigilance monitor was switched on in game options.
         /// </summary>
         public Func<bool> IsAlerterEnabled;
@@ -41,9 +45,13 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<bool> AlerterSound;
         /// <summary>
-        /// Max allowed speed for the train determined by consist.
+        /// Max allowed speed for the train in that moment.
         /// </summary>
         public Func<float> TrainSpeedLimitMpS;
+        /// <summary>
+        /// Max allowed speed for the train basing on consist and route max speed.
+        /// </summary>
+        public Func<float> TrainMaxSpeedMpS;
         /// <summary>
         /// Max allowed speed determined by current signal.
         /// </summary>

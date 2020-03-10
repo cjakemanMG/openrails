@@ -244,6 +244,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
             // TrainControlSystem getters
             Script.IsTrainControlEnabled = () => Locomotive == Locomotive.Train.LeadLocomotive && Locomotive.Train.TrainType != Train.TRAINTYPE.AI_PLAYERHOSTING;
+            Script.IsAutopiloted = () => Locomotive == Locomotive.Train.LeadLocomotive && Locomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING;
             Script.IsAlerterEnabled = () =>
             {
                 return Simulator.Settings.Alerter
@@ -254,6 +255,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.IsSpeedControlEnabled = () => Simulator.Settings.SpeedControl;
             Script.AlerterSound = () => Locomotive.AlerterSnd;
             Script.TrainSpeedLimitMpS = () => TrainInfo.allowedSpeedMpS;
+            Script.TrainMaxSpeedMpS = () => Locomotive.Train.TrainMaxSpeedMpS;
             Script.CurrentSignalSpeedLimitMpS = () => Locomotive.Train.allowedMaxSpeedSignalMpS;
             Script.NextSignalSpeedLimitMpS = (value) => NextSignalItem<float>(value, ref SignalSpeedLimits, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.NextSignalAspect = (value) => NextSignalItem<Aspect>(value, ref SignalAspects, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
