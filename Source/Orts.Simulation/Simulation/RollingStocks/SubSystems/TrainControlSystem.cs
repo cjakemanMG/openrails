@@ -244,7 +244,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
 
             // TrainControlSystem getters
             Script.IsTrainControlEnabled = () => Locomotive == Locomotive.Train.LeadLocomotive && Locomotive.Train.TrainType != Train.TRAINTYPE.AI_PLAYERHOSTING;
-            Script.IsAutopiloted = () => Locomotive == Locomotive.Train.LeadLocomotive && Locomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING;
+            Script.IsAutopiloted = () => Locomotive == Simulator.PlayerLocomotive && Locomotive.Train.TrainType == Train.TRAINTYPE.AI_PLAYERHOSTING;
             Script.IsAlerterEnabled = () =>
             {
                 return Simulator.Settings.Alerter
