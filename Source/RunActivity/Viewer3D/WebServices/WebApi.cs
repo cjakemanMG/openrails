@@ -31,7 +31,6 @@ using Orts.Simulation.Physics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using static Orts.Viewer3D.Popups.TrainDrivingWindow;
 
 namespace Orts.Viewer3D.WebServices
 {
@@ -216,12 +215,12 @@ namespace Orts.Viewer3D.WebServices
         // Provides most of the data in the Train Driving Ctrl+F5
         public class TrainDrivingInfo
         {
-            public List<ListLabel> trainDrivingData = new List<ListLabel>();
+            public List<Popups.TrainDrivingWindow.ListLabel> trainDrivingData = new List<Popups.TrainDrivingWindow.ListLabel>();
         }
 
         public object ApiTrainDriving(string Parameters)
         {
-            List<ListLabel> trainDrivingInfo = Viewer.TrainDrivingWindow.TrainDrivingWebApiData();
+            List<Popups.TrainDrivingWindow.ListLabel> trainDrivingInfo = Viewer.TrainDrivingWindow.TrainDrivingWebApiData();
             return new TrainDrivingInfo
             { trainDrivingData = trainDrivingInfo };
         }

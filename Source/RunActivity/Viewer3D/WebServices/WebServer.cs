@@ -419,7 +419,7 @@ namespace Orts.Viewer3D.WebServices
 
         private static void HTMLContent(HttpResponse response, string embed)
         {
-            response.strContent = "<!DOCTYPE HTML>" +
+            response.strContent = "<!doctype HTML>" +
                                   "<html>" +
                                   "<head>" +
                                   "<meta http-equiv=\"Content-Type\" content=\"text/html;" +

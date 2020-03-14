@@ -53,15 +53,16 @@ function api() {
 			if (obj != null) // Can happen using IEv11
 			{
 				Str = "<table>";
-				var endIndexFirst = 0;
-				var endIndexLast = 0;
-				var endIndexKey = 0;
-				var keyPressedColor = "";
-				var newDataFirst = "";
-				var newDataLast = "";
-				var smallSymbolColor = "";
-				var stringColorFirst = "";
-				var stringColorLast = "";
+				var endIndexFirst = 0,
+					endIndexLast = 0,
+					endIndexKey = 0;
+					
+				var keyPressedColor = "",
+					newDataFirst = "",
+					newDataLast = "",
+					smallSymbolColor = "",
+					stringColorFirst = "",
+					stringColorLast = "";
 				// Color codes
 				var codeColor = ['???','??!','?!?','?!!','!??','!!?','!!!','%%%','$$$'];
 				// Customize data
@@ -158,8 +159,17 @@ function api() {
 }
 
 function changePageColor() {
-    var buttons = document.getElementsByTagName("button");  
-    for (var i= 0; i < buttons.length;  i++) {
-      	buttons[i].onclick = function() {document.body.className = this.innerHTML.toLowerCase()};
+	var buttonClicked = document.getElementById("buttonDN");
+	var bodyColor = document.getElementById("body");
+	
+	if (buttonClicked.innerHTML == "Day"){
+		buttonClicked.innerHTML = "Night";
+		bodyColor.style.background = "black";
+		bodyColor.style.color =	"white";
+	}
+	else if (buttonClicked.innerHTML == "Night"){
+		buttonClicked.innerHTML = "Day"
+		bodyColor.style.background = "white";
+		bodyColor.style.color =	"black";
 	}
 };

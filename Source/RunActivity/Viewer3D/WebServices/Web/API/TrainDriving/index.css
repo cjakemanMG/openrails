@@ -11,16 +11,8 @@
 	border: gray 2px solid;
 	border-radius: 20px;
 	text-align: center;
-	display: inline-block;
+	width: 50px;
 	margin: 4px 2px;	
-}
-.day{
-    background-color: white;
-    color: black;
-}
-.night{
-    background-color: black;
-    color: white;
 }
 
 /* Allows to apply text color */

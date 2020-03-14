@@ -9,11 +9,10 @@
 	<link rel="stylesheet" type="text/css" href="index.css">  
 </head>
 
-<body onload="poll(500)" ><!-- 500 mSec is the default and may be omitted -->
+<body id="body" onload="poll(500)" ><!-- 500 mSec is the default and may be omitted -->
   <div id=menu><a href="/">Back to Menu</a>
     <h2> Open Rails - Train Driving (Ctrl-F5) </h2>  
-    <button class="button" onclick="changePageColor()">Day</button>
-    <button class="button" onclick="changePageColor()">Night</button>
+    <button class="button" onclick="changePageColor()" id="buttonDN">Day</button>
     <table class="border" id="TrainDriving"></table>
   </div>
   <script src="index.js"></script>
