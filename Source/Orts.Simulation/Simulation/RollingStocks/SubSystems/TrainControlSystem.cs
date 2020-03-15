@@ -264,6 +264,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.DoesNextNormalSignalHaveTwoAspects = () => DoesNextNormalSignalHaveTwoAspects();
             Script.NextDistanceSignalAspect = () => NextDistanceSignalItem<Aspect>(ref SignalAspect, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
             Script.NextDistanceSignalDistanceM = () => NextDistanceSignalItem<float>(ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.SIGNAL);
+            Script.DoesNextNormalSignalHaveRepeaterHead = () => DoesNextNormalSignalHaveRepeaterHead();
             Script.CurrentPostSpeedLimitMpS = () => Locomotive.Train.allowedMaxSpeedLimitMpS;
             Script.NextPostSpeedLimitMpS = (value) => NextSignalItem<float>(value, ref PostSpeedLimits, Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST);
             Script.NextPostDistanceM = (value) => NextSignalItem<float>(value, ref PostDistances, Train.TrainObjectItem.TRAINOBJECTTYPE.SPEEDPOST);
@@ -498,6 +499,20 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             SignalAspect = Aspect.None;
             SignalDistance = float.MaxValue;
             return retval;
+        }
+
+        private bool DoesNextNormalSignalHaveRepeaterHead()
+        {
+            var signal = Locomotive.Train.NextSignalObject[Locomotive.Train.MUDirection == Direction.Reverse ? 1 : 0];
+            if (signal != null)
+            {
+                foreach (var signalHead in signal.SignalHeads)
+                {
+                    if (signalHead.signalType.FnType == Formats.Msts.MstsSignalFunction.REPEATER) return true;
+                }
+                return false;
+            }
+            return false;
         }
 
         private bool DoesStartFromTerminalStation()
