@@ -85,6 +85,10 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float> NextDistanceSignalDistanceM;
         /// <summary>
+        /// Next normal signal has a repeater head
+        /// </summary>
+        public Func<bool> DoesNextNormalSignalHaveRepeaterHead;
+        /// <summary>
         /// Max allowed speed determined by current speedpost.
         /// </summary>
         public Func<float> CurrentPostSpeedLimitMpS;
