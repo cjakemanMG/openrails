@@ -297,20 +297,20 @@ namespace Orts.Simulation.RollingStocks
                     break;
 
                 case CABViewControlTypes.ORTS_PANTOGRAPH3:
-                    data = Pantographs.List.Count > 2 && Pantographs[UsingRearCab && Pantographs.List.Count > 1 ? 4 : 3].CommandUp ? 1 : 0;
+                    data = Pantographs.List.Count > 2 && Pantographs[UsingRearCab && Pantographs.List.Count > 3 ? 4 : 3].CommandUp ? 1 : 0;
                     break;
 
                 case CABViewControlTypes.ORTS_PANTOGRAPH4:
-                    data = Pantographs.List.Count > 3 && Pantographs[4].CommandUp ? 1 : 0;
+                    data = Pantographs.List.Count > 3 && Pantographs[UsingRearCab ? 3 : 4].CommandUp ? 1 : 0;
                     break;
 
                 case CABViewControlTypes.PANTOGRAPHS_4:
                 case CABViewControlTypes.PANTOGRAPHS_4C:
                     if (Pantographs[1].CommandUp && Pantographs[2].CommandUp)
                         data = 2;
-                    else if (Pantographs[1].CommandUp)
+                    else if (Pantographs[UsingRearCab ? 2 : 1].CommandUp)
                         data = 1;
-                    else if (Pantographs[2].CommandUp)
+                    else if (Pantographs[UsingRearCab ? 1 : 2].CommandUp)
                         data = 3;
                     else
                         data = 0;
