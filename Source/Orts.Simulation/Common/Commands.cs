@@ -238,7 +238,16 @@ namespace Orts.Common
         public override void Redo() {
             if (Receiver != null && Receiver.Train != null)
             {
-                Receiver.Train.SignalEvent((ToState ? PowerSupplyEvent.RaisePantograph : PowerSupplyEvent.LowerPantograph), item);
+                var realItem = item;
+                if (Receiver.UsingRearCab)
+                {
+                    if (item == 1 && Receiver.Pantographs.List.Count > 1) realItem = 2;
+                    else if (item == 2) realItem = 1;
+                    else if (item == 3 && Receiver.Pantographs.List.Count > 3) realItem = 4;
+                    else if (item == 4) realItem = 3;
+                }
+                Receiver.Train.SignalEvent((!Receiver.Pantographs[realItem].CommandUp ? PowerSupplyEvent.RaisePantograph : PowerSupplyEvent.LowerPantograph),
+                    realItem);
             }
         }
 
