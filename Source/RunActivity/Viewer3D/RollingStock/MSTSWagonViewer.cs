@@ -477,10 +477,16 @@ namespace Orts.Viewer3D.RollingStock
 
         public override void InitializeUserInputCommands()
         {
-            UserInputCommands.Add(UserCommand.ControlPantograph1, new Action[] { Noop, () => new PantographCommand(Viewer.Log, 1, !MSTSWagon.Pantographs[1].CommandUp) });
-            UserInputCommands.Add(UserCommand.ControlPantograph2, new Action[] { Noop, () => new PantographCommand(Viewer.Log, 2, !MSTSWagon.Pantographs[2].CommandUp) });
-            if (MSTSWagon.Pantographs.List.Count > 2) UserInputCommands.Add(UserCommand.ControlPantograph3, new Action[] { Noop, () => new PantographCommand(Viewer.Log, 3, !MSTSWagon.Pantographs[3].CommandUp) });
-            if (MSTSWagon.Pantographs.List.Count > 3) UserInputCommands.Add(UserCommand.ControlPantograph4, new Action[] { Noop, () => new PantographCommand(Viewer.Log, 4, !MSTSWagon.Pantographs[4].CommandUp) });
+            MSTSLocomotive locomotive = null;
+            if (MSTSWagon is MSTSLocomotive) locomotive = MSTSWagon as MSTSLocomotive;
+            UserInputCommands.Add(UserCommand.ControlPantograph1, new Action[] { Noop, () => new PantographCommand(Viewer.Log,
+                locomotive != null && locomotive.UsingRearCab && MSTSWagon.Pantographs.List.Count > 1 ? 2 : 1, !MSTSWagon.Pantographs[locomotive != null && locomotive.UsingRearCab && MSTSWagon.Pantographs.List.Count > 1 ? 2 : 1].CommandUp) });
+            UserInputCommands.Add(UserCommand.ControlPantograph2, new Action[] { Noop, () => new PantographCommand(Viewer.Log,
+                locomotive != null && locomotive.UsingRearCab ? 1 : 2, !MSTSWagon.Pantographs[locomotive != null && locomotive.UsingRearCab ? 1 : 2].CommandUp) });
+            if (MSTSWagon.Pantographs.List.Count > 2) UserInputCommands.Add(UserCommand.ControlPantograph3, new Action[] { Noop, () => new PantographCommand(Viewer.Log,
+                locomotive != null && locomotive.UsingRearCab && locomotive.Pantographs.List.Count > 3 ? 4 : 3, !MSTSWagon.Pantographs[locomotive != null && locomotive.UsingRearCab && locomotive.Pantographs.List.Count > 3 ? 4 : 3].CommandUp) });
+            if (MSTSWagon.Pantographs.List.Count > 3) UserInputCommands.Add(UserCommand.ControlPantograph4, new Action[] { Noop, () => new PantographCommand(Viewer.Log,
+                locomotive != null && locomotive.UsingRearCab ? 3 : 4, !MSTSWagon.Pantographs[locomotive != null && locomotive.UsingRearCab ? 3 : 4].CommandUp) });
             UserInputCommands.Add(UserCommand.ControlDoorLeft, new Action[] { Noop, () => new ToggleDoorsLeftCommand(Viewer.Log) });
             UserInputCommands.Add(UserCommand.ControlDoorRight, new Action[] { Noop, () => new ToggleDoorsRightCommand(Viewer.Log) });
             UserInputCommands.Add(UserCommand.ControlMirror, new Action[] { Noop, () => new ToggleMirrorsCommand(Viewer.Log) });
