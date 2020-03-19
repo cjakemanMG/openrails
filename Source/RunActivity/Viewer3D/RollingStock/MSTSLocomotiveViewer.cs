@@ -1947,34 +1947,49 @@ namespace Orts.Viewer3D.RollingStock
                 case CABViewControlTypes.BELL: new BellCommand(Viewer.Log, ChangedValue(Locomotive.Bell ? 1 : 0) > 0); break;
                 case CABViewControlTypes.SANDERS:
                 case CABViewControlTypes.SANDING: new SanderCommand(Viewer.Log, ChangedValue(Locomotive.Sander ? 1 : 0) > 0); break;
-                case CABViewControlTypes.PANTOGRAPH: new PantographCommand(Viewer.Log, 1, ChangedValue(Locomotive.Pantographs[1].CommandUp ? 1 : 0) > 0); break;
-                case CABViewControlTypes.PANTOGRAPH2: new PantographCommand(Viewer.Log, 2, ChangedValue(Locomotive.Pantographs[2].CommandUp ? 1 : 0) > 0); break;
-                case CABViewControlTypes.ORTS_PANTOGRAPH3: new PantographCommand(Viewer.Log, 3, ChangedValue(Locomotive.Pantographs[3].CommandUp ? 1 : 0) > 0); break;
-                case CABViewControlTypes.ORTS_PANTOGRAPH4: new PantographCommand(Viewer.Log, 4, ChangedValue(Locomotive.Pantographs[4].CommandUp ? 1 : 0) > 0); break;
+                case CABViewControlTypes.PANTOGRAPH:
+                    var p1 = Locomotive.UsingRearCab && Locomotive.Pantographs.List.Count > 1 ? 2 : 1;
+                    new PantographCommand(Viewer.Log, p1, ChangedValue(Locomotive.Pantographs[p1].CommandUp ? 1 : 0) > 0);
+                    break;
+                case CABViewControlTypes.PANTOGRAPH2:
+                    var p2 = Locomotive.UsingRearCab ? 1 : 2;
+                    new PantographCommand(Viewer.Log, p2 , ChangedValue(Locomotive.Pantographs[p2].CommandUp ? 1 : 0) > 0);
+                    break;
+                case CABViewControlTypes.ORTS_PANTOGRAPH3:
+                    var p3 = Locomotive.UsingRearCab && Locomotive.Pantographs.List.Count > 3 ? 4 : 3;
+                    new PantographCommand(Viewer.Log, p3,
+                    ChangedValue(Locomotive.Pantographs[p3].CommandUp ? 1 : 0) > 0);
+                    break;
+                case CABViewControlTypes.ORTS_PANTOGRAPH4:
+                    var p4 = Locomotive.UsingRearCab ? 3 : 4;
+                    new PantographCommand(Viewer.Log, p4, ChangedValue(Locomotive.Pantographs[p4].CommandUp ? 1 : 0) > 0);
+                    break;
                 case CABViewControlTypes.PANTOGRAPHS_4C:
                 case CABViewControlTypes.PANTOGRAPHS_4:
                     var pantos = ChangedValue(0);
                     if (pantos != 0)
                     {
-                        if (Locomotive.Pantographs[1].State == PantographState.Down && Locomotive.Pantographs[2].State == PantographState.Down)
+                        var pp1 = Locomotive.UsingRearCab && Locomotive.Pantographs.List.Count > 1 ? 2 : 1;
+                        var pp2 = Locomotive.UsingRearCab ? 1 : 2;
+                        if (Locomotive.Pantographs[pp1].State == PantographState.Down && Locomotive.Pantographs[pp2].State == PantographState.Down)
                         {
-                            if (pantos > 0) new PantographCommand(Viewer.Log, 1, true);
-                            else if (Control.ControlType == CABViewControlTypes.PANTOGRAPHS_4C) new PantographCommand(Viewer.Log, 2, true);
+                            if (pantos > 0) new PantographCommand(Viewer.Log, pp1, true);
+                            else if (Control.ControlType == CABViewControlTypes.PANTOGRAPHS_4C) new PantographCommand(Viewer.Log, pp2, true);
                         }
-                        else if (Locomotive.Pantographs[1].State == PantographState.Up && Locomotive.Pantographs[2].State == PantographState.Down)
+                        else if (Locomotive.Pantographs[pp1].State == PantographState.Up && Locomotive.Pantographs[pp2].State == PantographState.Down)
                         {
-                            if (pantos > 0) new PantographCommand(Viewer.Log, 2, true);
-                            else new PantographCommand(Viewer.Log, 1, false);
+                            if (pantos > 0) new PantographCommand(Viewer.Log, pp2, true);
+                            else new PantographCommand(Viewer.Log, pp1, false);
                         }
-                        else if (Locomotive.Pantographs[1].State == PantographState.Up && Locomotive.Pantographs[2].State == PantographState.Up)
+                        else if (Locomotive.Pantographs[pp1].State == PantographState.Up && Locomotive.Pantographs[pp2].State == PantographState.Up)
                         {
-                            if (pantos > 0) new PantographCommand(Viewer.Log, 1, false);
-                            else new PantographCommand(Viewer.Log, 2, false);
+                            if (pantos > 0) new PantographCommand(Viewer.Log, pp1, false);
+                            else new PantographCommand(Viewer.Log, pp2, false);
                         }
-                        else if (Locomotive.Pantographs[1].State == PantographState.Down && Locomotive.Pantographs[2].State == PantographState.Up)
+                        else if (Locomotive.Pantographs[pp1].State == PantographState.Down && Locomotive.Pantographs[pp2].State == PantographState.Up)
                         {
-                            if (pantos < 0) new PantographCommand(Viewer.Log, 1, true);
-                            else if (Control.ControlType == CABViewControlTypes.PANTOGRAPHS_4C) new PantographCommand(Viewer.Log, 2, false);
+                            if (pantos < 0) new PantographCommand(Viewer.Log, pp1, true);
+                            else if (Control.ControlType == CABViewControlTypes.PANTOGRAPHS_4C) new PantographCommand(Viewer.Log, pp2, false);
                         }
                     }
                     break;
