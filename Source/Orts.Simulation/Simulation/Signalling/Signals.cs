@@ -8560,6 +8560,7 @@ namespace Orts.Simulation.Signalling
             ApproachControlSet = inf.ReadBoolean();
             ClaimLocked = inf.ReadBoolean();
             ForcePropOnApproachControl = inf.ReadBoolean();
+            hasPermission = (Permission)inf.ReadInt32();
 
             // set dummy train, route direction index will be set later on restore of train
 
@@ -8706,6 +8707,7 @@ namespace Orts.Simulation.Signalling
             outf.Write(ApproachControlSet);
             outf.Write(ClaimLocked);
             outf.Write(ForcePropOnApproachControl);
+            outf.Write((int)hasPermission);
             outf.Write(LockedTrains.Count);
             for (int cnt = 0; cnt < LockedTrains.Count; cnt++)
             {
