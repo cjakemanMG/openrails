@@ -188,6 +188,14 @@ namespace ORTS.Scripting.Api
         /// Get Control Mode of player train
         /// </summary>
         public Func<TRAIN_CONTROL> GetControlMode;
+        /// <summary>
+        /// Get name of next station if any, else empty string
+        /// </summary>
+        public Func<string> NextStationName;
+        /// <summary>
+        /// Get distance of next station if any, else max float value
+        /// </summary>
+        public Func<float> NextStationDistanceM;
 
 
 
