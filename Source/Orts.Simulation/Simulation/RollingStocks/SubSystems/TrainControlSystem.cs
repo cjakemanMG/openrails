@@ -290,6 +290,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Script.GetTrackNodeOffset = () => Locomotive.Train.FrontTDBTraveller.TrackNodeLength - Locomotive.Train.FrontTDBTraveller.TrackNodeOffset;
             Script.NextDivergingSwitchDistanceM = (value) => NextDivergingSwitchItem<float>(value, ref SignalDistance, Train.TrainObjectItem.TRAINOBJECTTYPE.FACING_SWITCH);
             Script.GetControlMode = () => (TRAIN_CONTROL)(int)Locomotive.Train.ControlMode;
+            Script.NextStationName = () => Locomotive.Train.StationStops != null && Locomotive.Train.StationStops.Count > 0 ? Locomotive.Train.StationStops[0].PlatformItem.Name : "";
+            Script.NextStationDistanceM = () => Locomotive.Train.StationStops != null && Locomotive.Train.StationStops.Count  > 0 ? Locomotive.Train.StationStops[0].DistanceToTrainM : float.MaxValue;
 
             // TrainControlSystem functions
             Script.SpeedCurve = (arg1, arg2, arg3, arg4, arg5) => SpeedCurve(arg1, arg2, arg3, arg4, arg5);
