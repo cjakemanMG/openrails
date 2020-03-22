@@ -374,6 +374,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         {
             if (forsight < 0) forsight = 0;
             if (forsight >= list.Count) SearchTrainInfo(forsight, type);
+            // <CSComment> Doesn't : list.Count - 1 lead to wrong returns if forsight > 0? </CSComment>
             return list[forsight < list.Count ? forsight : list.Count - 1];
         }
 
