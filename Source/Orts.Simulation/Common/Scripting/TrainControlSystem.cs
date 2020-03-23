@@ -474,6 +474,14 @@ namespace ORTS.Scripting.Api
         /// Generic TCS button released.
         /// </summary>
         GenericTCSButtonReleased,
+        /// <summary>
+        /// Circuit breaker has been closed.
+        /// </summary>
+        CircuitBreakerClosed,
+        /// <summary>
+        /// Circuit breaker has been opened.
+        /// </summary>
+        CircuitBreakerOpen,
     }
 
     /// <summary>
