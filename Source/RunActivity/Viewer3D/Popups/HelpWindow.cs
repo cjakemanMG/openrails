@@ -825,7 +825,8 @@ namespace Orts.Viewer3D.Popups
                                 //Station departure before passenger boarding completed. -80.                                
                                 labeltext = "  Departure before passenger boarding completed=" + ndepartbeforeboarding;
                                 outmesssage(labeltext, colWidth * 8, true, 1);
-                                ndepartbeforeboarding = 80 * ndepartbeforeboarding;
+                                // calculated according to the stationarrival value
+                                ndepartbeforeboarding = (int)(80 / nstationarrival) * ndepartbeforeboarding;
                             }
                             else
                             {
@@ -834,9 +835,9 @@ namespace Orts.Viewer3D.Popups
                             }
 
                             //Station Arrival, Departure, Passing Evaluation. Overall Rating.
-                            double nstationdelmisbef = nstationdelayed + nstationmissed + ndepartbeforeboarding;
-                            int nstatarrdeppaseval = DbfEvalStationName.Count != dbfstationstopsremaining && (nstationdelmisbef) <= 100 ? (nstationarrival == DbfEvalStationName.Count && nstationdelmisbef == 0) ? 100 : Convert.ToInt16(100 - nstationdelmisbef) : 0;
-                            labeltext = DbfEvalStationName.Count != dbfstationstopsremaining ? "  Overall rating total=" + nstatarrdeppaseval : "  Overall rating total=0";
+                            double nstationDelMisBef = nstationdelayed + nstationmissed + ndepartbeforeboarding;
+                            int nstatArrDepPasEval = DbfEvalStationName.Count != dbfstationstopsremaining && (nstationDelMisBef) <= 100 ? (nstationarrival == DbfEvalStationName.Count && nstationDelMisBef == 0) ? 100 : Convert.ToInt16(100 - nstationDelMisBef) : 0;
+                            labeltext = DbfEvalStationName.Count != dbfstationstopsremaining ? "  Overall rating total=" + nstatArrDepPasEval : "  Overall rating total=0";
                             outmesssagecolor(labeltext, colWidth * 4, Color.Yellow, true, 1, 1);
 
                             //Work orders. 100.
@@ -879,9 +880,9 @@ namespace Orts.Viewer3D.Popups
                             }
                             //Work orders. 100. Overall Rating.
                             colWidth = (cl.RemainingWidth - cl.TextHeight) / 14;
-                            int nworkorderseval = DbfEvalTaskName.Count > 0 ? ((100 / DbfEvalTaskName.Count) * ndbfEvalTaskAccomplished) - (noverspeedcoupling * 5) : 0;
-                            nworkorderseval = nworkorderseval > 0 ? nworkorderseval : 0;
-                            labeltext = "  Overall rating total=" + nworkorderseval;
+                            int nWorkOrdersEval = DbfEvalTaskName.Count > 0 ? ((100 / DbfEvalTaskName.Count) * ndbfEvalTaskAccomplished) - (noverspeedcoupling * 5) : 0;
+                            nWorkOrdersEval = nWorkOrdersEval > 0 ? nWorkOrdersEval : 0;
+                            labeltext = "  Overall rating total=" + nWorkOrdersEval;
                             outmesssagecolor(labeltext, colWidth * 4, Color.Yellow, true, 2, 1);
 
                             //----------------------
@@ -976,9 +977,9 @@ namespace Orts.Viewer3D.Popups
                             nfullbrakeabove16kmh = 35 * nfullbrakeabove16kmh;
 
                             //Emergency/Penalty Actions Evaluation. 100. Overall Rating.
-                            int nepactionseval = nebpbstopped + nebpbmoving + nfullbrakeappunder8kmh + nfullbrakeabove16kmh;
-                            nepactionseval = 100 - (nepactionseval > 100 ? 100 : nepactionseval);
-                            labeltext = "  Overall rating total=" + nepactionseval;
+                            int nEmPeActionsEval = nebpbstopped + nebpbmoving + nfullbrakeappunder8kmh + nfullbrakeabove16kmh;
+                            nEmPeActionsEval = 100 - (nEmPeActionsEval > 100 ? 100 : nEmPeActionsEval);
+                            labeltext = "  Overall rating total=" + nEmPeActionsEval;
                             outmesssagecolor(labeltext, colWidth * 8, Color.Yellow, true, 5, 1);
                             line = scrollbox.AddLayoutHorizontalLineOfText();
                             line = scrollbox.AddLayoutHorizontalLineOfText();
@@ -999,13 +1000,13 @@ namespace Orts.Viewer3D.Popups
                             line = scrollbox.AddLayoutHorizontalLineOfText();
 
                             //Station Arrival, Departure, Passing Evaluation. 100
-                            labeltext = "1- Station Arrival, Departure, Passing Evaluation=" + (nstatarrdeppaseval > 0 ? DrawStar(nstatarrdeppaseval) : " .");
+                            labeltext = "1- Station Arrival, Departure, Passing Evaluation=" + (nstatArrDepPasEval > 0 ? DrawStar(nstatArrDepPasEval) : " .");
                             outmesssagecolor(labeltext, colWidth * 4, Color.Yellow, false, 6, 1);
                             line = scrollbox.AddLayoutHorizontalLineOfText();
                             line = scrollbox.AddLayoutHorizontalLineOfText();
 
                             //Work orders Evaluation. 100                            
-                            labeltext = "2- Work orders Evaluation=" + (nworkorderseval > 0 ? DrawStar(nworkorderseval) : " .");
+                            labeltext = "2- Work orders Evaluation=" + (nWorkOrdersEval > 0 ? DrawStar(nWorkOrdersEval) : " .");
                             outmesssagecolor(labeltext, colWidth * 4, Color.Yellow, false, 6, 1);
                             line = scrollbox.AddLayoutHorizontalLineOfText();
                             line = scrollbox.AddLayoutHorizontalLineOfText();
@@ -1023,7 +1024,7 @@ namespace Orts.Viewer3D.Popups
                             line = scrollbox.AddLayoutHorizontalLineOfText();
 
                             //Emergency/Penalty Actions Evaluation. 100.
-                            labeltext = "5- Emergency/Penalty Actions Evaluation=" + (nepactionseval > 0 ? DrawStar(nepactionseval) : " .");
+                            labeltext = "5- Emergency/Penalty Actions Evaluation=" + (nEmPeActionsEval > 0 ? DrawStar(nEmPeActionsEval) : " .");
                             outmesssagecolor(labeltext, colWidth * 4, Color.Yellow, false, 6, 1);
                             line = scrollbox.AddLayoutHorizontalLineOfText();
                             line = scrollbox.AddLayoutHorizontalLineOfText();
@@ -1073,10 +1074,17 @@ namespace Orts.Viewer3D.Popups
         string DrawStar(int value)
         {
             string star;
-            string starBlack = " ★ ★ ★ ★ ★";
+            string starBlack = " ★ ★ ★ ★ ●";
             string starWhite = " ☆ ☆ ☆ ☆ ☆";
-
-            star = (starBlack.Substring(0, value / 10).ToString() + starWhite.Substring(value / 10, 10 - (value/10)).ToString());
+            if (value == 100)
+            {   // Five stars only for 100 points
+                star = " ★ ★ ★ ★ ★";
+            }
+            else
+            {   // more accuracy
+                var valueCeiling = (int)Math.Ceiling(value / 10.0);
+                star = (starBlack.Substring(0, valueCeiling).ToString() + starWhite.Substring(valueCeiling, 10 - valueCeiling).ToString());
+            }
             return star;
         }
 
