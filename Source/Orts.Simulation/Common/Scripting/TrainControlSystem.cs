@@ -185,6 +185,10 @@ namespace ORTS.Scripting.Api
         /// </summary>
         public Func<float, float> NextDivergingSwitchDistanceM;
         /// <summary>
+        /// Search next trailing diverging switch distance
+        /// </summary>
+        public Func<float, float> NextTrailingDivergingSwitchDistanceM;
+        /// <summary>
         /// Get Control Mode of player train
         /// </summary>
         public Func<TRAIN_CONTROL> GetControlMode;

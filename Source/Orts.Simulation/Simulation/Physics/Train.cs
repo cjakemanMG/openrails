@@ -13776,6 +13776,54 @@ namespace Orts.Simulation.Physics
 
         //================================================================================================//
         /// <summary>
+        /// Search trailing diverging switch
+        /// </summary>
+        /// 
+        public float NextTrailingDivergingSwitchDistanceM(float maxDistanceM)
+        {
+            var switchDistanceM = float.MaxValue;
+            // run along forward path to catch the first trailing diverging switch
+            if (ValidRoute[0] != null)
+            {
+                float distanceToTrainM = 0.0f;
+                float offset = PresentPosition[0].TCOffset;
+                TrackCircuitSection firstSection = signalRef.TrackCircuitList[PresentPosition[0].TCSectionIndex];
+                float sectionStart = -offset;
+                int startRouteIndex = PresentPosition[0].RouteListIndex;
+                if (startRouteIndex < 0) startRouteIndex = ValidRoute[0].GetRouteIndex(PresentPosition[0].TCSectionIndex, 0);
+                if (startRouteIndex >= 0)
+                {
+                    int routeSectionIndex = PresentPosition[0].TCSectionIndex;
+                    for (int iRouteElement = startRouteIndex; iRouteElement < ValidRoute[0].Count && distanceToTrainM < maxDistanceM && sectionStart < maxDistanceM; iRouteElement++)
+                    {
+                        TrackCircuitSection thisSection = signalRef.TrackCircuitList[ValidRoute[0][iRouteElement].TCSectionIndex];
+                        int sectionDirection = ValidRoute[0][iRouteElement].Direction;
+
+                        if (thisSection.CircuitType == TrackCircuitSection.TrackCircuitType.Junction && (thisSection.Pins[sectionDirection, 1].Link == -1) && sectionStart < maxDistanceM)
+                        {
+                            // is trailing
+                            TrJunctionNode junctionNode = Simulator.TDB.TrackDB.TrackNodes[thisSection.OriginalIndex].TrJunctionNode;
+                            if ((thisSection.Pins[sectionDirection == 0 ? 1 : 0, 1].Link == routeSectionIndex && thisSection.JunctionDefaultRoute == 0) ||
+                                (thisSection.Pins[sectionDirection == 0 ? 1 : 0, 0].Link == routeSectionIndex && thisSection.JunctionDefaultRoute > 0))
+                            {
+                                //is trailing diverging
+                                switchDistanceM = sectionStart;
+                                break;
+                            }
+
+                        }
+                        routeSectionIndex = ValidRoute[0][iRouteElement].TCSectionIndex;
+                        sectionStart += thisSection.Length;
+                    }
+                }
+            }
+            return switchDistanceM;
+        }
+
+
+
+        //================================================================================================//
+        /// <summary>
         /// Create Track Circuit Route Path
         /// </summary>
 
