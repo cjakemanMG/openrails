@@ -17,6 +17,7 @@
 
 using System;
 using ORTS.Common;
+using Orts.Simulation.RollingStocks;
 
 namespace ORTS.Scripting.Api
 {
@@ -200,6 +201,10 @@ namespace ORTS.Scripting.Api
         /// Get distance of next station if any, else max float value
         /// </summary>
         public Func<float> NextStationDistanceM;
+        /// <summary>
+        /// Get locomotive handle
+        /// </summary>
+        public Func<MSTSLocomotive> Locomotive;
 
 
 
