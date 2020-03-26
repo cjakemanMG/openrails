@@ -1,5 +1,5 @@
-﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.55
-March 14th, 2020
+﻿Open Rails, Monogame version (unofficial) README - Release NewYear - Rev.56
+March 26th, 2020
 
 Please note that the installation and use of Open Rails software, even of its unofficial versions, is governed by the Open Rails End User License Agreement. 
 
@@ -33,8 +33,9 @@ It includes some features not (yet) available in the Open Rails unstable officia
 - bug fix for bad mouse pointing in full screen mode and for issues with Fast full screen-Alt-Tab mode
 - allow display of special characters in web client, by mbm_OR
 - support for AWS TCS scripts, see https://blueprints.launchpad.net/or/+spec/expand-potential-of-tcs-scripts : enable AWS TCS
-- NEW: further improvements and additions to WebServer, including Train Driving Info by mbm_OR
+- panto commands and animations now swapped when in rear cab, see https://bugs.launchpad.net/or/+bug/1867782
 - NEW: further additions to support of TCS scripts, see https://blueprints.launchpad.net/or/+spec/expand-potential-of-tcs-scripts : enable SCMT+RSC TCS
+- NEW: improvements in Activity Evaluation of station stops, by mbm_OR
 
 
 
