@@ -1288,7 +1288,7 @@ namespace Orts.Simulation.Signalling
         //================================================================================================//
         /// <summary>
         /// Find_Next_Object_InRoute : find next item along path of train - using Route List (only forward)
-        /// Objects to search for : SpeedPost, Normal Signal
+        /// Objects to search for : SpeedPost, Signal
         ///
         /// Usage :
         ///   always set : RouteList, RouteNodeIndex, distance along RouteNode, fnType
@@ -1382,20 +1382,21 @@ namespace Orts.Simulation.Signalling
                         }
                     }
                 }
-                else if (fn_type == MstsSignalFunction.DISTANCE)
+                // other fn_types
+                else
                 {
                     TrackCircuitSignalList thisSignalList =
-                        thisSection.CircuitItems.TrackCircuitSignals[actDirection][(int)MstsSignalFunction.DISTANCE];
+                        thisSection.CircuitItems.TrackCircuitSignals[actDirection][(int)fn_type];
                     locstate = ObjectItemInfo.ObjectItemFindState.None;
 
-                    if (thisSignalList.TrackCircuitItem.Count > 0)
+                    foreach (TrackCircuitSignalItem thisSignal in thisSignalList.TrackCircuitItem)
                     {
-                        TrackCircuitSignalItem thisSignal = thisSignalList.TrackCircuitItem[0];
                         if (thisSignal.SignalLocation > lengthOffset)
                         {
                             locstate = ObjectItemInfo.ObjectItemFindState.Object;
                             foundObject = thisSignal.SignalRef;
                             totalLength += (thisSignal.SignalLocation - lengthOffset);
+                            break;
                         }
                     }
                 }
