@@ -20227,5 +20227,21 @@ namespace Orts.Simulation.Physics
             else ToggleToManualMode();
             Simulator.Confirmer.Confirm(CabControl.SignalMode, CabSetting.Off);
         }
+
+        public class LocationData
+        {
+            public float Latitude { get; set; }
+            public float Longitude { get; set; }
+        }
+
+        public LocationData GetTrainLocation() // Initially just for Player Train
+        {
+            var trainCar = this.LeadLocomotive as TrainCar;
+            var position = trainCar.WorldPosition;
+            // Convert position to location
+            return new LocationData();
+        }
+
+
     }// class Train
 }
