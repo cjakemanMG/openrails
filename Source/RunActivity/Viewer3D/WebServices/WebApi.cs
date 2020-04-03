@@ -49,6 +49,7 @@ namespace Orts.Viewer3D.WebServices
             ApiDict.Add("/API/TEMPLATE/", ApiTemplate);
             ApiDict.Add("/API/TRACKMONITOR/", ApiTrackMonitor);
             ApiDict.Add("/API/TRAINDRIVING/", ApiTrainDriving);
+            ApiDict.Add("/API/TRAINDRIVING/", ApiTrainLocation);
         }
 
         #region /API/Template/
@@ -199,14 +200,22 @@ namespace Orts.Viewer3D.WebServices
             var trainInfo = Viewer.PlayerTrain.GetTrainInfo();
 
             return new TrackMonitorInfo
-            { controlMode = trainInfo.ControlMode
-            , speedMpS = trainInfo.speedMpS
-            , projectedSpeedMpS = trainInfo.projectedSpeedMpS
-            , allowedSpeedMpS = trainInfo.allowedSpeedMpS
-            , currentElevationPercent = trainInfo.currentElevationPercent
-            , direction = trainInfo.direction
-            , cabOrientation = trainInfo.cabOrientation
-            , isOnPath = trainInfo.isOnPath
+            {
+                controlMode = trainInfo.ControlMode
+            ,
+                speedMpS = trainInfo.speedMpS
+            ,
+                projectedSpeedMpS = trainInfo.projectedSpeedMpS
+            ,
+                allowedSpeedMpS = trainInfo.allowedSpeedMpS
+            ,
+                currentElevationPercent = trainInfo.currentElevationPercent
+            ,
+                direction = trainInfo.direction
+            ,
+                cabOrientation = trainInfo.cabOrientation
+            ,
+                isOnPath = trainInfo.isOnPath
             };
         }
         #endregion
@@ -223,6 +232,34 @@ namespace Orts.Viewer3D.WebServices
             List<Popups.TrainDrivingWindow.ListLabel> trainDrivingInfo = Viewer.TrainDrivingWindow.TrainDrivingWebApiData();
             return new TrainDrivingInfo
             { trainDrivingData = trainDrivingInfo };
+        }
+        #endregion
+
+        #region /API/ApiTrainLocation/
+        // Returns location of drivable trains
+        public class CustomObject2
+        {
+            public string Str;
+            public int Int;
+        }
+
+        public class ApiLocalModel
+        {
+            public float Latitude;
+            public float Longitude;
+        }
+
+        public object ApiTrainLocation(string parameters)
+        {
+            var trainData = Viewer.PlayerTrain.GetTrainLocation();
+            var data = new ApiLocalModel()
+            {
+                Latitude = trainData.Latitude
+            ,
+                Longitude = trainData.Longitude
+            };
+
+            return (data);
         }
         #endregion
     }
