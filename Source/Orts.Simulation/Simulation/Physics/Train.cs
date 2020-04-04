@@ -20231,8 +20231,10 @@ namespace Orts.Simulation.Physics
 
         public class LocationData
         {
-            public float Latitude { get; set; }
-            public float Longitude { get; set; }
+            public float LatitudeRadians { get; set; }
+            public float LongitudeRadians { get; set; }
+            public float LatitudeDegrees { get; set; }
+            public float LongitudeDegrees { get; set; }
         }
 
         public LocationData GetTrainLocation() // Initially just for Player Train
@@ -20243,17 +20245,20 @@ namespace Orts.Simulation.Physics
             var tileX = trainCar.WorldPosition.TileX;
             var tileZ = trainCar.WorldPosition.TileZ;
             var location = trainCar.WorldPosition.WorldLocation.Location;
-            double latitude = 0;
-            double longitude = 0;
+            double latitudeRadians = 0;
+            double longitudeRadians = 0;
 
             // Convert to LatLon
             var worldLatLon = new Orts.Common.WorldLatLon();
-            var resultCode = worldLatLon.ConvertWTC(tileX, tileZ, location, ref latitude, ref longitude);
+            var resultCode = worldLatLon.ConvertWTC(tileX, tileZ, location, ref latitudeRadians, ref longitudeRadians);
 
             return new LocationData()
-                { Latitude = (float)latitude
-                , Longitude = (float)longitude
-                };
+                { LatitudeRadians = (float)latitudeRadians
+                , LongitudeRadians = (float)longitudeRadians
+                , LatitudeDegrees = MathHelper.ToDegrees((float)latitudeRadians)
+                , LongitudeDegrees = MathHelper.ToDegrees((float)longitudeRadians)
+
+            };
         }
 
         // Get the current latitude and longitude coordinates

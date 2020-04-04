@@ -253,8 +253,8 @@ namespace Orts.Viewer3D.WebServices
         {
             var trainData = Viewer.PlayerTrain.GetTrainLocation();
             var data = new ApiLocalModel()
-            { Latitude = trainData.Latitude
-            , Longitude = trainData.Longitude
+            { Latitude = trainData.LatitudeDegrees
+            , Longitude = trainData.LongitudeDegrees
             };
 
             return (data);
