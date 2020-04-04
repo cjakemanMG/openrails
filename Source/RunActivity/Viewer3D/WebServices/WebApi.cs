@@ -49,7 +49,7 @@ namespace Orts.Viewer3D.WebServices
             ApiDict.Add("/API/TEMPLATE/", ApiTemplate);
             ApiDict.Add("/API/TRACKMONITOR/", ApiTrackMonitor);
             ApiDict.Add("/API/TRAINDRIVING/", ApiTrainDriving);
-            ApiDict.Add("/API/TRAINDRIVING/", ApiTrainLocation);
+            ApiDict.Add("/API/TRAINLOCATION/", ApiTrainLocation);
         }
 
         #region /API/Template/
@@ -253,10 +253,8 @@ namespace Orts.Viewer3D.WebServices
         {
             var trainData = Viewer.PlayerTrain.GetTrainLocation();
             var data = new ApiLocalModel()
-            {
-                Latitude = trainData.Latitude
-            ,
-                Longitude = trainData.Longitude
+            { Latitude = trainData.Latitude
+            , Longitude = trainData.Longitude
             };
 
             return (data);

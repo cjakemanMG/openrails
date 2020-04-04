@@ -20238,11 +20238,26 @@ namespace Orts.Simulation.Physics
         public LocationData GetTrainLocation() // Initially just for Player Train
         {
             var trainCar = this.LeadLocomotive as TrainCar;
-            var position = trainCar.WorldPosition;
-            // Convert position to location
-            return new LocationData();
+            
+            // Extract location from WorldPosition
+            var tileX = trainCar.WorldPosition.TileX;
+            var tileZ = trainCar.WorldPosition.TileZ;
+            var location = trainCar.WorldPosition.WorldLocation.Location;
+            double latitude = 0;
+            double longitude = 0;
+
+            // Convert to LatLon
+            var worldLatLon = new Orts.Common.WorldLatLon();
+            var resultCode = worldLatLon.ConvertWTC(tileX, tileZ, location, ref latitude, ref longitude);
+
+            return new LocationData()
+                { Latitude = (float)latitude
+                , Longitude = (float)longitude
+                };
         }
 
+        // Get the current latitude and longitude coordinates
+        //int resultCode = Orts.Common.ConvertWTC(Viewer.Camera.TileX, Viewer.Camera.TileZ, Viewer.Camera.Location, ref latitude, ref longitude);
 
     }// class Train
 }
